@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Optimal Parameters-based Geographical Detector(OPGD)</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Optimal Parameters-based Geographical
+Detector(OPGD)</h1>
+
+
+
+<div id="load-data-and-package" class="section level3">
+<h3>Load data and package</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(gdverse)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;ndvi&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">head</span>(ndvi)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="do">## # A tibble: 6 × 7</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">##   NDVIchange Climatezone Mining Tempchange Precipitation   GDP Popdensity</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">##        &lt;dbl&gt; &lt;chr&gt;       &lt;fct&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## 1    0.116   Bwk         low         0.256          237. 12.6      1.45  </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## 2    0.0178  Bwk         low         0.273          214.  2.69     0.801 </span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## 3    0.138   Bsk         low         0.302          449. 20.1     11.5   </span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## 4    0.00439 Bwk         low         0.383          213.  0        0.0462</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## 5    0.00316 Bwk         low         0.357          205.  0        0.0748</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="do">## 6    0.00838 Bwk         low         0.338          201.  0        0.549</span></span></code></pre></div>
+</div>
+<div id="determine-optimal-discretization-parameters" class="section level3">
+<h3>Determine optimal discretization parameters</h3>
+<p><code>Climatezone</code> and <code>Mining</code> is the discrete
+category variables in the <code>ndvi</code> data, we need to discretize
+others. We can use <code>gd_bestunidisc()</code> to discretize them
+based on geodetector q-statistic.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">tic</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>g <span class="ot">=</span> <span class="fu">gd_bestunidisc</span>(NDVIchange <span class="sc">~</span> .,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                   <span class="at">data =</span> <span class="fu">select</span>(ndvi,<span class="sc">-</span><span class="fu">c</span>(Climatezone,Mining)),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                   <span class="at">discnum =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">cores =</span> <span class="dv">6</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">toc</span>()</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="do">## 2.31 sec elapsed</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>g</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="do">## $x</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="do">## [1] &quot;GDP&quot;           &quot;Popdensity&quot;    &quot;Precipitation&quot; &quot;Tempchange&quot;   </span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="do">## $k</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="do">## [1] 14 15 15 15</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="do">## $method</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="do">## [1] &quot;quantile&quot; &quot;quantile&quot; &quot;fisher&quot;   &quot;equal&quot;   </span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="do">## $disv</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="do">## # A tibble: 713 × 4</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="do">##      GDP Popdensity Precipitation Tempchange</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="do">##    &lt;int&gt;      &lt;int&gt;         &lt;int&gt;      &lt;int&gt;</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="do">##  1     7          6             5          3</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="do">##  2     5          4             4          3</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="do">##  3     7         10            10          3</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="do">##  4     3          1             4          4</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="do">##  5     3          2             4          3</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="do">##  6     3          3             4          3</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="do">##  7     7          6             4          3</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="do">##  8     8          8             5          3</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="do">##  9    11         11             7          3</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="do">## 10     8          9             8          3</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="do">## # ℹ 703 more rows</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>new.ndvi <span class="ot">=</span> g<span class="sc">$</span>disv</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>new.ndvi</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="do">## # A tibble: 713 × 4</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="do">##      GDP Popdensity Precipitation Tempchange</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="do">##    &lt;int&gt;      &lt;int&gt;         &lt;int&gt;      &lt;int&gt;</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="do">##  1     7          6             5          3</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="do">##  2     5          4             4          3</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="do">##  3     7         10            10          3</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="do">##  4     3          1             4          4</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="do">##  5     3          2             4          3</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="do">##  6     3          3             4          3</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="do">##  7     7          6             4          3</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="do">##  8     8          8             5          3</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="do">##  9    11         11             7          3</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="do">## 10     8          9             8          3</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="do">## # ℹ 703 more rows</span></span></code></pre></div>
+<p>The <code>new.ndvi</code> is the discreted result of the optimal
+discretization parameter based on the Q statistic of the geographical
+detector (factor detector), we can combine it with other columns in
+<code>ndvi</code> tibble now.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>new.ndvi <span class="ot">=</span> <span class="fu">bind_cols</span>(<span class="fu">select</span>(ndvi,NDVIchange,Climatezone,Mining),new.ndvi)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>new.ndvi</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## # A tibble: 713 × 7</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">##    NDVIchange Climatezone Mining   GDP Popdensity Precipitation Tempchange</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">##         &lt;dbl&gt; &lt;chr&gt;       &lt;fct&gt;  &lt;int&gt;      &lt;int&gt;         &lt;int&gt;      &lt;int&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">##  1    0.116   Bwk         low        7          6             5          3</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">##  2    0.0178  Bwk         low        5          4             4          3</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="do">##  3    0.138   Bsk         low        7         10            10          3</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="do">##  4    0.00439 Bwk         low        3          1             4          4</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="do">##  5    0.00316 Bwk         low        3          2             4          3</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="do">##  6    0.00838 Bwk         low        3          3             4          3</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="do">##  7    0.0335  Bwk         low        7          6             4          3</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="do">##  8    0.0387  Bwk         low        8          8             5          3</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="do">##  9    0.0882  Bsk         low       11         11             7          3</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="do">## 10    0.0690  Bsk         low        8          9             8          3</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="do">## # ℹ 703 more rows</span></span></code></pre></div>
+</div>
+<div id="run-geodetector" class="section level3">
+<h3>Run geodetector</h3>
+<p>Then, we can run geodetector model by <code>gd()</code> function.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">gd</span>(NDVIchange <span class="sc">~</span> .,<span class="at">data =</span> new.ndvi,<span class="at">type =</span> <span class="st">&#39;factor&#39;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">## ***          Factor Detector            </span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">## |   variable    | Q-statistic | P-value  |</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">## |:-------------:|:-----------:|:--------:|</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="do">## | Precipitation |  0.8811989  | 9.91e-10 |</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="do">## |  Climatezone  |  0.8218335  | 7.34e-10 |</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="do">## |  Tempchange   |  0.3478433  | 2.41e-10 |</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">## |  Popdensity   |  0.2059304  | 5.09e-10 |</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">## |    Mining     |  0.1411154  | 6.73e-10 |</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="do">## |      GDP      |  0.1069398  | 4.54e-10 |</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">gd</span>(NDVIchange <span class="sc">~</span> .,<span class="at">data =</span> new.ndvi,<span class="at">type =</span> <span class="st">&#39;interaction&#39;</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">## ***        Interaction Detector         </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="do">## |    Interactive variable     |    Interaction     |</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="do">## |:---------------------------:|:------------------:|</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="do">## |    Climatezone ∩ Mining     |    Enhance, bi-    |</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="do">## |      Climatezone ∩ GDP      |    Enhance, bi-    |</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="do">## |  Climatezone ∩ Popdensity   |    Enhance, bi-    |</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="do">## | Climatezone ∩ Precipitation |    Enhance, bi-    |</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="do">## |  Climatezone ∩ Tempchange   |    Enhance, bi-    |</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="do">## |        Mining ∩ GDP         | Enhance, nonlinear |</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="do">## |     Mining ∩ Popdensity     | Enhance, nonlinear |</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="do">## |   Mining ∩ Precipitation    |    Enhance, bi-    |</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="do">## |     Mining ∩ Tempchange     |    Enhance, bi-    |</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="do">## |      GDP ∩ Popdensity       |    Enhance, bi-    |</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="do">## |     GDP ∩ Precipitation     |    Enhance, bi-    |</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="do">## |      GDP ∩ Tempchange       | Enhance, nonlinear |</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="do">## | Popdensity ∩ Precipitation  |    Enhance, bi-    |</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="do">## |   Popdensity ∩ Tempchange   |    Enhance, bi-    |</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="do">## | Precipitation ∩ Tempchange  |    Enhance, bi-    |</span></span></code></pre></div>
+</div>
+<div id="you-can-also-use-opgd-in-one-time-to-get-result-above." class="section level3">
+<h3>You can also use <code>opgd()</code> in one time to get result
+above.</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>ndvi_opgd <span class="ot">=</span> <span class="fu">opgd</span>(NDVIchange <span class="sc">~</span> ., <span class="at">data =</span> ndvi, <span class="at">discnum =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">15</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                 <span class="at">discvar =</span> <span class="fu">names</span>(<span class="fu">select</span>(ndvi,<span class="sc">-</span><span class="fu">c</span>(NDVIchange,Climatezone,Mining))),</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                 <span class="at">cores =</span> <span class="dv">6</span>, <span class="at">type =</span> <span class="fu">c</span>(<span class="st">&#39;factor&#39;</span>,<span class="st">&#39;interaction&#39;</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>ndvi_opgd</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="do">##                 OPGD Model                  </span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="do">## ***          Factor Detector            </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="do">## |   variable    | Q-statistic | P-value  |</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="do">## |:-------------:|:-----------:|:--------:|</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="do">## | Precipitation |  0.8811989  | 9.91e-10 |</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="do">## |  Climatezone  |  0.8218335  | 7.34e-10 |</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="do">## |  Tempchange   |  0.3478433  | 2.41e-10 |</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="do">## |  Popdensity   |  0.2059304  | 5.09e-10 |</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="do">## |    Mining     |  0.1411154  | 6.73e-10 |</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="do">## |      GDP      |  0.1069398  | 4.54e-10 |</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="do">## ***        Interaction Detector         </span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="do">## |    Interactive variable     |    Interaction     |</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="do">## |:---------------------------:|:------------------:|</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="do">## |    Climatezone ∩ Mining     |    Enhance, bi-    |</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="do">## |      Climatezone ∩ GDP      |    Enhance, bi-    |</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="do">## |  Climatezone ∩ Popdensity   |    Enhance, bi-    |</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="do">## | Climatezone ∩ Precipitation |    Enhance, bi-    |</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="do">## |  Climatezone ∩ Tempchange   |    Enhance, bi-    |</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="do">## |        Mining ∩ GDP         | Enhance, nonlinear |</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="do">## |     Mining ∩ Popdensity     | Enhance, nonlinear |</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="do">## |   Mining ∩ Precipitation    |    Enhance, bi-    |</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="do">## |     Mining ∩ Tempchange     |    Enhance, bi-    |</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="do">## |      GDP ∩ Popdensity       |    Enhance, bi-    |</span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="do">## |     GDP ∩ Precipitation     |    Enhance, bi-    |</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="do">## |      GDP ∩ Tempchange       | Enhance, nonlinear |</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="do">## | Popdensity ∩ Precipitation  |    Enhance, bi-    |</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="do">## |   Popdensity ∩ Tempchange   |    Enhance, bi-    |</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="do">## | Precipitation ∩ Tempchange  |    Enhance, bi-    |</span></span></code></pre></div>
+<p>You can use <code>plot()</code> to visualize the result.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">plot</span>(ndvi_opgd)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
