@@ -9,9 +9,8 @@ idsa(
   data,
   wt = NULL,
   overlaymethod = "and",
-  locations = NULL,
-  discnum = NULL,
-  discmethod = NULL,
+  discnum = 3:22,
+  discmethod = "quantile",
   strategy = 2L,
   increase_rate = 0.05,
   cores = 1,
@@ -23,16 +22,12 @@ idsa(
 \arguments{
 \item{formula}{A formula of IDSA model.}
 
-\item{data}{A data.frame or tibble of observation data.}
+\item{data}{A data.frame, tibble or sf object of observation data.}
 
-\item{wt}{(optional) The spatial weight matrix. When \code{wt} is not provided, must provide \code{locations}.
-And \code{gdverse} will use \code{locations} columns to construct spatial weight use \code{inverse_distance_weight()}.}
+\item{wt}{(optional) The spatial weight matrix. When \code{data} is not an \code{sf} object, must provide \code{wt}.}
 
 \item{overlaymethod}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
 Default is \code{and}.}
-
-\item{locations}{(optional) The spatial location coordinate columns name in \code{data}.
-Useful and must provided when \code{wt} is not provided. When \code{wt} is provided, \code{locations} is not need.}
 
 \item{discnum}{(optional) Number of multilevel discretization. Default will use \code{3:22}.}
 
@@ -72,6 +67,8 @@ A list with PID values tibble under different spatial overlays and performance e
 Function for interactive detector for spatial associations model.
 }
 \note{
+\strong{Please note that all variables in the IDSA model need to be continuous data}.
+
 The IDSA model requires at least \eqn{2^n-1} calculations when has \eqn{n} explanatory variables.
 When there are more than 10 explanatory variables, carefully consider the computational burden of this model.
 When there are a large number of explanatory variables, the data dimensionality reduction method can be used
@@ -79,9 +76,8 @@ to ensure the trade-off between analysis results and calculation speed.
 }
 \examples{
 data('sim')
-g = idsa(y ~ ., data = sim,
-         locations = c('lo','la'),
-         discvar = c("xa","xb","xc"))
+sim1 = sf::st_as_sf(sim,coords = c('lo','la'))
+g = idsa(y ~ ., data = sim1)
 g
 
 }

@@ -2,7 +2,7 @@
 title: "Geographical Detector(GD)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GD}
+  %\VignetteIndexEntry{gd}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -165,7 +165,7 @@ plot(id)
 
 ### Risk detector
 
-```{r rd,fig.width=7.5,fig.height=4.5}
+```{r rd,fig.width=5.25,fig.height=4.5}
 rd = gd(incidence ~ watershed + elevation + soiltype,
         data = NTDs,type = 'risk')
 rd
@@ -199,7 +199,7 @@ ed99
 
 ### Running four basic geodetectors simultaneously
 
-```{r gd_all,fig.width=9,fig.height=11.5}
+```{r gd_all,fig.width=9,fig.height=7.5}
 g = gd(incidence ~ watershed + elevation + soiltype,
        data = NTDs,
        type = c("factor", "interaction", "risk", "ecological"))

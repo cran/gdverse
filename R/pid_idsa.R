@@ -34,6 +34,12 @@
 #'
 #' @return A list with the optimal parameter in the provided parameter combination with `k`,
 #' `method` and `disc`(when `return_disc` is `TRUE`).
+#' \describe{
+#' \item{\code{x}}{discretization variable name}
+#' \item{\code{k}}{optimal number of spatial data discreteization}
+#' \item{\code{method}}{optimal spatial data discretization method}
+#' \item{\code{disc}}{the result of optimal spatial data discretization}
+#' }
 #' @export
 #'
 #' @examples
@@ -43,8 +49,8 @@
 #'           data = sim,
 #'           wt = wt)
 #'
-cpsd_disc =  \(formula, data, wt, discnum = NULL, discmethod = NULL, strategy = 2L,
-               increase_rate = 0.05,cores = 1,return_disc = TRUE,seed = 123456789,...){
+cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strategy = 2L,
+               increase_rate = 0.05, cores = 1, return_disc = TRUE, seed = 123456789, ...){
   if (!(strategy %in% c(1L,2L))){
     stop("`strategy` must `1L` or `2L`!")
   }
@@ -58,8 +64,6 @@ cpsd_disc =  \(formula, data, wt, discnum = NULL, discmethod = NULL, strategy = 
     cores = parallel::makeCluster(cores)
     on.exit(parallel::stopCluster(cores), add=TRUE)
   }
-  if (is.null(discmethod)) {discmethod = "quantile"}
-  if (is.null(discnum)){discnum = 3:22}
 
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)

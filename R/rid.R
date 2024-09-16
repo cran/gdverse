@@ -18,7 +18,7 @@
 #' See `vignette('RGDRID',package = 'gdverse')` for more details.
 #'
 #' @param formula A formula of RID model.
-#' @param data A data.frame or tibble of observation data.
+#' @param data A data.frame, tibble or sf object of observation data.
 #' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
 #' Default is `and`.
 #' @param discvar Name of continuous variable columns that need to be discretized. Noted that
@@ -42,11 +42,12 @@
 #'         discvar = c("xa","xb","xc"), discnum = 4, cores = 6)
 #' g
 #' }
-rid = \(formula,data,overlaymethod = 'and', discvar,
+rid = \(formula,data,overlaymethod = 'and',discvar,
         discnum = NULL, minsize = NULL, cores = 1){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   yname = formula.vars[1]
+  if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
   if (formula.vars[2] != "."){
     dti = dplyr::select(data,dplyr::all_of(formula.vars))
   } else {

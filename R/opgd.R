@@ -9,12 +9,12 @@
 #' doi: 10.1080/15481603.2020.1760434.
 #'
 #' @param formula A formula of OPGD model.
-#' @param data A data.frame or tibble of observation data.
+#' @param data A data.frame, tibble or sf object of observation data.
 #' @param discvar Name of continuous variable columns that need to be discretized.Noted that
 #' when `formula` has `discvar`, `data` must have these columns.
 #' @param discnum (optional) A vector of number of classes for discretization. Default is `3:22`.
-#' @param discmethod (optional) A vector of methods for discretization,default is using
-#' `c("sd","equal","pretty","quantile","fisher","headtails","maximum","box")`in `gdverse`.
+#' @param discmethod (optional) A vector of methods for discretization, default is using
+#' `c("sd","equal","pretty","quantile","fisher","headtails","maximum","box")`.
 #' @param cores (optional) A positive integer(default is 1). If cores > 1, a 'parallel' package
 #' cluster with that many cores is created and used. You can also supply a cluster object.
 #' @param type (optional) The type of geographical detector,which must be `factor`(default),
@@ -38,11 +38,13 @@
 #'      discvar = paste0('x',letters[1:3]),
 #'      discnum = 3:6)
 #'
-opgd = \(formula,data,discvar,discnum = NULL,discmethod = NULL,
+opgd = \(formula, data, discvar, discnum = 3:22,
+         discmethod = c("sd","equal","pretty","quantile","fisher","headtails","maximum","box"),
          cores = 1, type = "factor", alpha = 0.95, ...){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   yname = formula.vars[1]
+  if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
   if (formula.vars[2] != "."){
     data = dplyr::select(data,dplyr::all_of(formula.vars))
   }

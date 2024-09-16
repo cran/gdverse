@@ -344,7 +344,7 @@ Associations(IDSA)</h1>
 <p>The IDSA model is based on the SPADE model, which extends the power
 of spatial determinant of the SPADE model to multivariable interaction
 and takes spatial fuzzy overlay into account.</p>
-<p>In this vignette, we used the same data as SPADE vignette to
+<p>In this vignette, we used the same data as the SPADE vignette to
 demonstrate the use of the IDSA model.</p>
 <div id="load-data-and-package" class="section level3">
 <h3>Load data and package</h3>
@@ -431,27 +431,23 @@ explain <code>SUHI</code>, which is removed here.</p>
 <div id="construct-spatial-weight" class="section level3">
 <h3>Construct spatial Weight</h3>
 <p>We use the same spatial weight matrix as SPADE vignette.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>wt <span class="ot">=</span> ushi <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">if_any</span>(<span class="fu">everything</span>(),is.na)) <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> sfdep<span class="sc">::</span><span class="fu">st_contiguity</span>(geom),</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>         <span class="at">wt =</span> sfdep<span class="sc">::</span><span class="fu">st_weights</span>(nb)) <span class="sc">%$%</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  sfdep<span class="sc">::</span><span class="fu">wt_as_matrix</span>(nb,wt)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>wt <span class="ot">=</span> sdsfun<span class="sc">::</span><span class="fu">spdep_contiguity_swm</span>(ushi)</span></code></pre></div>
 </div>
 <div id="idsa-modeling" class="section level3">
 <h3>IDSA modeling</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>idsa.model <span class="ot">=</span> <span class="fu">idsa</span>(SUHI <span class="sc">~</span> . ,<span class="at">data =</span> newdata, <span class="at">wt =</span> wt, <span class="at">cores =</span> <span class="dv">6</span>)</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>idsa.model <span class="ot">=</span> <span class="fu">idsa</span>(SUHI <span class="sc">~</span> ., <span class="at">data =</span> newdata, <span class="at">wt =</span> wt, <span class="at">cores =</span> <span class="dv">6</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>idsa.model</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## ***     Interactive Detector For Spatial Associations </span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## |                   varibale                   |     PID     |</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">## |:--------------------------------------------:|:-----------:|</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">## | landscape ∩ dist_cold_heat ∩ urbanbuilt_form | 0.456037749 |</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="do">## |       dist_cold_heat ∩ urbanbuilt_form       | 0.409391856 |</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="do">## |               urbanbuilt_form                | 0.345502490 |</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="do">## |         landscape ∩ urbanbuilt_form          | 0.330585501 |</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="do">## |                dist_cold_heat                | 0.123563063 |</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="do">## |          landscape ∩ dist_cold_heat          | 0.071627057 |</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="do">## |                  landscape                   | 0.004188307 |</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">## | landscape ∩ dist_cold_heat ∩ urbanbuilt_form | 0.455535905 |</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="do">## |       dist_cold_heat ∩ urbanbuilt_form       | 0.408837104 |</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="do">## |               urbanbuilt_form                | 0.345728704 |</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="do">## |         landscape ∩ urbanbuilt_form          | 0.330273768 |</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="do">## |                dist_cold_heat                | 0.123441382 |</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="do">## |          landscape ∩ dist_cold_heat          | 0.071538071 |</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="do">## |                  landscape                   | 0.004183838 |</span></span>
 <span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="do">##  --------- IDSA model performance evaluation: --------</span></span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="do">##  * Number of overlay zones :  11 </span></span>

@@ -89,13 +89,10 @@ cpsd_spade = \(yobs,xobs,xdisc,wt){
 #' Xuezhi Cang & Wei Luo (2018) Spatial association detector (SPADE),International
 #' Journal of Geographical Information Science, 32:10, 2055-2075, DOI:  10.1080/13658816.2018.1476693
 #'
-#' @param formula A formula of calculate power of spatial and multilevel discretization determinant `PSMDQ_s`.
-#' @param data A data.frame or tibble of observation data.
-#' @param wt (optional) The spatial weight matrix. When `wt` is not provided, must provide `locations`,
-#' then `gdverse` will use `locations` columns to construct spatial weight use `inverse_distance_weight()`.
-#' @param locations (optional) The geospatial locations coordinate columns name which in `data`.
-#' Useful and must provided when `wt` is not provided.
-#' @param discnum (optional) Number of multilevel discretization.Default will use `3:22`.
+#' @param yobs Variable Y
+#' @param xobs The original undiscretized covariable X.
+#' @param wt The spatial weight matrix.
+#' @param discnum (optional) Number of multilevel discretization. Default will use `3:22`.
 #' @param discmethod (optional) The discretization methods. Default will use `quantile`.
 #' If `discmethod` is set to `robust`, the function `robust_disc()` will be used. Conversely,
 #' if `discmethod` is set to `rpart`, the `rpart_disc()` function will be used. Others use
@@ -109,12 +106,12 @@ cpsd_spade = \(yobs,xobs,xdisc,wt){
 #'
 #' @examples
 #' data('sim')
-#' psmd_spade(y ~ .,
-#'            data = dplyr::select(sim,1:4),
-#'            locations = c('lo','la'))
+#' wt = inverse_distance_weight(sim$lo,sim$la)
+#' psmd_spade(sim$y,sim$xa,wt)
 #'
-psmd_spade = \(formula,data,wt = NULL,locations = NULL,discnum = NULL,
-               discmethod = NULL, cores = 1, seed = 123456789, ...){
+psmd_spade = \(yobs, xobs, wt, discnum = 3:22,
+               discmethod = 'quantile', cores = 1,
+               seed = 123456789, ...){
   doclust = FALSE
   if (cores > 1) {
     doclust = TRUE
@@ -123,48 +120,13 @@ psmd_spade = \(formula,data,wt = NULL,locations = NULL,discnum = NULL,
     on.exit(parallel::stopCluster(cores), add=TRUE)
   }
 
-  formula = stats::as.formula(formula)
-  formula.vars = all.vars(formula)
-  yobs = data[, formula.vars[1], drop = TRUE]
-  if (formula.vars[2] == "."){
-    if (length(which(!(colnames(data) %in% c(formula.vars[1],locations)))) > 1) {
-      stop('please only keep `dependent` and `independent` columns in `data`; When `wt` is not provided, please make sure `locations` coordinate columns is also contained in `data`.')
-    } else {
-      xobs = data[, -which(colnames(data) %in% c(formula.vars[1],locations)), drop = TRUE]
-    }
-  } else {
-    xobs = data[, which(colnames(data) == formula.vars[2]), drop = TRUE]
-  }
-
-  if (is.null(wt)) {
-    if (is.null(locations)) {
-      stop("When `wt` is not provided, please provided `locations` coordinate columns name which in `data`!")
-    } else {
-      locations = data[, locations]
-      wt_spade = inverse_distance_weight(locations[,1,drop = TRUE],
-                                         locations[,2,drop = TRUE])
-    }
-  } else {
-    wt_spade = wt
-  }
-
-  if (is.null(discnum)) {
-    discn = 3:22
-  } else {
-    discn = discnum
-  }
-  if (is.null(discmethod)){
-    discm = 'quantile'
-  } else {
-    discm = discmethod
-  }
-
-  if (discm == 'rpart'){
+  if (discmethod == 'rpart'){
     discdf = tibble::tibble(yobs = yobs,
                             xobs = xobs)
     xdisc = rpart_disc("yobs ~ .", data = discdf, ...)
-    out_g = cpsd_spade(yobs,xobs,xdisc,wt_spade)
+    out_g = cpsd_spade(yobs,xobs,xdisc,wt)
   } else {
+    wt_cpsd = wt # ensure that R can access wt during parallel computation.
     spade_disc = \(yv,xv,discn,discm,cores,...){
       if (discm == 'robust') {
         discdf = rep(list("xobs" = xv),length(discn))
@@ -187,22 +149,22 @@ psmd_spade = \(formula,data,wt = NULL,locations = NULL,discnum = NULL,
       }
       return(discdf)
     }
-    discdf = spade_disc(yobs,xobs,discn,discm,cores_rdisc,...)
+    discdf = spade_disc(yobs,xobs,discnum,discmethod,cores_rdisc,...)
 
     calcul_cpsd = \(paramn){
       yvar = discdf[,'yobs',drop = TRUE]
       xvar = discdf[,'xobs',drop = TRUE]
       xdisc = discdf[,paramn,drop = TRUE]
-      return(cpsd_spade(yvar,xvar,xdisc,wt_spade))
+      return(cpsd_spade(yvar,xvar,xdisc,wt_cpsd))
     }
 
     if (doclust) {
       parallel::clusterExport(cores,c('st_unidisc','robust_disc',
                                       'psd_spade','cpsd_spade','spvar'))
-      out_g = parallel::parLapply(cores,paste0('xobs_',discn),calcul_cpsd)
+      out_g = parallel::parLapply(cores,paste0('xobs_',discnum),calcul_cpsd)
       out_g = as.numeric(do.call(rbind, out_g))
     } else {
-      out_g = purrr::map_dbl(paste0('xobs_',discn),calcul_cpsd)
+      out_g = purrr::map_dbl(paste0('xobs_',discnum),calcul_cpsd)
     }
     out_g = mean(out_g)
   }

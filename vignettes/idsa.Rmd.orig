@@ -2,7 +2,7 @@
 title: "Interactive Detector For Spatial Associations(IDSA)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{IDSA}
+  %\VignetteIndexEntry{idsa}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 The IDSA model is based on the SPADE model, which extends the power of spatial determinant of the SPADE model to multivariable interaction and takes spatial fuzzy overlay into account.
 
-In this vignette, we used the same data as SPADE vignette to demonstrate the use of the IDSA model.
+In this vignette, we used the same data as the SPADE vignette to demonstrate the use of the IDSA model.
 
 ### Load data and package
 
@@ -72,17 +72,13 @@ newdata
 We use the same spatial weight matrix as SPADE vignette.
 
 ```{r}
-wt = ushi |>
-  dplyr::filter(!if_any(everything(),is.na)) |>
-  mutate(nb = sfdep::st_contiguity(geom),
-         wt = sfdep::st_weights(nb)) %$%
-  sfdep::wt_as_matrix(nb,wt)
+wt = sdsfun::spdep_contiguity_swm(ushi)
 ```
 
 ### IDSA modeling
 
 ```{r idsa_modeling,fig.width=4.25,fig.height=3.5}
-idsa.model = idsa(SUHI ~ . ,data = newdata, wt = wt, cores = 6)
+idsa.model = idsa(SUHI ~ ., data = newdata, wt = wt, cores = 6)
 idsa.model
 plot(idsa.model)
 ```
