@@ -17,12 +17,12 @@
 #' @param formula A formula of IDSA model.
 #' @param data A data.frame, tibble or sf object of observation data.
 #' @param wt (optional) The spatial weight matrix. When `data` is not an `sf` object, must provide `wt`.
-#' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
-#' Default is `and`.
 #' @param discnum (optional) Number of multilevel discretization. Default will use `3:22`.
 #' @param discmethod (optional) The discretization methods. Default all use `quantile`.
 #' Noted that `robust` will use `robust_disc()`; `rpart` will use `rpart_disc()`;
 #' Others use `st_unidisc()`. You can try `unidisc_methods()` to see supported methods in `st_unidisc()`.
+#' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
+#' Default is `and`.
 #' @param strategy (optional) Discretization strategy. When `strategy` is `1L`, choose the highest SPADE model q-statistics to
 #' determinate optimal spatial data discretization parameters. When `strategy` is `2L`, The optimal discrete parameters of
 #' spatial data are selected by combining LOESS model.
@@ -52,10 +52,9 @@
 #' g = idsa(y ~ ., data = sim1)
 #' g
 #'
-idsa = \(formula, data, wt = NULL, overlaymethod = 'and', discnum = 3:22,
-         discmethod = "quantile", strategy = 2L, increase_rate = 0.05,
+idsa = \(formula,data,wt = NULL,discnum = 3:22,discmethod = "quantile",
+         overlaymethod = 'and', strategy = 2L, increase_rate = 0.05,
          cores = 1, seed = 123456789, alpha = 0.95, ...){
-
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   if (inherits(data,'sf')) {
@@ -118,7 +117,7 @@ idsa = \(formula, data, wt = NULL, overlaymethod = 'and', discnum = 3:22,
     parallel::clusterExport(cores,c('spvar','psd_spade',
                                     'cpsd_spade','psd_iev',
                                     'st_fuzzyoverlay','pid_idsa'))
-    out_g = parallel::parLapply(cores,xs, calcul_pid)
+    out_g = parallel::parLapply(cores, xs, calcul_pid)
     out_g = tibble::as_tibble(do.call(rbind, out_g))
   } else {
     out_g = purrr::map_dfr(xs, calcul_pid)
@@ -145,7 +144,7 @@ idsa = \(formula, data, wt = NULL, overlaymethod = 'and', discnum = 3:22,
   risk2 = tibble::tibble(reszone = paste0('zone',reszone)) %>%
     dplyr::left_join(risk2, by = c('reszone' = 'zone_risk')) %>%
     dplyr::pull(Risk)
-  out_g = tibble::tibble(varibale = xsname) %>%
+  out_g = tibble::tibble(variable = xsname) %>%
     dplyr::bind_cols(out_g) %>%
     dplyr::arrange(dplyr::desc(pid_idsa))
 
@@ -171,16 +170,16 @@ idsa = \(formula, data, wt = NULL, overlaymethod = 'and', discnum = 3:22,
 #'
 print.idsa_result = \(x, ...) {
   cat("***     Interactive Detector For Spatial Associations ")
-  print(knitr::kable(dplyr::rename(x$interaction, PID = pid_idsa),
-                     format = "markdown",digits = 12,align = 'c',...))
+  print(knitr::kable(utils::head(dplyr::rename(x$interaction, PID = pid_idsa),5),
+                     format = "markdown", digits = 12, align = 'c', ...))
   cat("\n --------- IDSA model performance evaluation: --------\n",
       "* Number of overlay zones : ", x$number_overlay_zones, "\n",
       "* Percentage of finely divided zones : ",x$percentage_finely_divided_zones,"\n",
       "* Number of individual explanatory variables : ",x$number_individual_explanatory_variables,"\n",
       "\n ## Different of response variable between a pair of overlay zones:")
   x = dplyr::select(x$risk1,zone1st,zone2nd,Risk)
-  print(knitr::kable(utils::head(x,5),format = "markdown",align = 'c',...))
-  cat("\n #### Only the first five pairs of overlay zones are displayed! ####")
+  print(knitr::kable(utils::head(x,5), format = "markdown", align = 'c', ...))
+  cat("\n #### Only the first five pairs of interactions and overlay zones are displayed! ####")
 }
 
 #' @title plot IDSA risk result

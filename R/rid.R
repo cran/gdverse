@@ -15,16 +15,17 @@
 #' to ensure the trade-off between analysis results and calculation speed.
 #'
 #' Please set up python dependence and configure `GDVERSE_PYTHON` environment variable if you want to run `rid()`.
-#' See `vignette('RGDRID',package = 'gdverse')` for more details.
+#' See `vignette('rgdrid',package = 'gdverse')` for more details.
 #'
 #' @param formula A formula of RID model.
 #' @param data A data.frame, tibble or sf object of observation data.
-#' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
-#' Default is `and`.
 #' @param discvar Name of continuous variable columns that need to be discretized. Noted that
-#' when `formula` has `discvar`, `data` must have these columns.
+#' when `formula` has `discvar`, `data` must have these columns. By default, all independent
+#' variables are used as `discvar`.
 #' @param discnum A numeric vector for the number of discretized classes of columns that need
 #' to be discretized. Default all `discvar` use `10`.
+#' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
+#' Default is `and`.
 #' @param minsize (optional) The min size of each discretization group. Default all use `1`.
 #' @param cores (optional) Positive integer(default is 1). If cores > 1, use parallel computation.
 #'
@@ -42,8 +43,8 @@
 #'         discvar = c("xa","xb","xc"), discnum = 4, cores = 6)
 #' g
 #' }
-rid = \(formula,data,overlaymethod = 'and',discvar,
-        discnum = NULL, minsize = NULL, cores = 1){
+rid = \(formula, data, discvar = NULL, discnum = 10,
+        overlaymethod = 'and', minsize = 1, cores = 1){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   yname = formula.vars[1]
@@ -54,8 +55,11 @@ rid = \(formula,data,overlaymethod = 'and',discvar,
     dti = data
   }
   xname = colnames(dti)[-which(colnames(dti) == yname)]
+  if (is.null(discvar)) {
+    discvar = xname
+  }
   discdf =  dplyr::select(dti,dplyr::all_of(c(yname,discvar)))
-  if (is.null(discnum)) {discnum = rep(10,length(discvar))}
+  if (length(discnum)==0) {discnum = rep(discnum,length(discvar))}
   g = robust_disc(paste0(yname,'~',paste0(discvar,collapse = '+')),
                   discdf, discnum, minsize, cores = cores)
   discedvar = colnames(dti[,-which(colnames(dti) %in% discvar)])

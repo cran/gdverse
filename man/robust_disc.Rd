@@ -4,7 +4,7 @@
 \alias{robust_disc}
 \title{univariate discretization based on offline change point detection}
 \usage{
-robust_disc(formula, data, discnum, minsize = NULL, cores = 1)
+robust_disc(formula, data, discnum, minsize = 1, cores = 1)
 }
 \arguments{
 \item{formula}{A formula of univariate discretization.}
@@ -27,7 +27,7 @@ change point detection.
 }
 \note{
 Please set up python dependence and configure \code{GDVERSE_PYTHON} environment variable if you want to run \code{robust_disc()}.
-See \code{vignette('RGDRID',package = 'gdverse')} for more details.
+See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 }
 \examples{
 \dontrun{

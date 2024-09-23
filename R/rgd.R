@@ -7,12 +7,13 @@
 #' DOI: 10.1016/j.jag.2022.102782.
 #' @note
 #' Please set up python dependence and configure `GDVERSE_PYTHON` environment variable if you want to run `rgd()`.
-#' See `vignette('RGDRID',package = 'gdverse')` for more details.
+#' See `vignette('rgdrid',package = 'gdverse')` for more details.
 #'
 #' @param formula A formula of RGD model.
 #' @param data A data.frame, tibble or sf object of observation data.
 #' @param discvar Name of continuous variable columns that need to be discretized. Noted that
-#' when `formula` has `discvar`, `data` must have these columns.
+#' when `formula` has `discvar`, `data` must have these columns. By default, all independent
+#' variables are used as `discvar`.
 #' @param discnum A numeric vector of discretized classes of columns that need to be discretized.
 #' Default all `discvar` use `10`.
 #' @param minsize (optional) The min size of each discretization group. Default all use `1`.
@@ -38,17 +39,20 @@
 #' g = rgd(NDVIchange ~ ., data = ndvi, discvar = names(ndvi)[-1:-3],
 #'         cores = 6, type =c('factor','interaction'))
 #' }
-rgd = \(formula,data,discvar,discnum = NULL,minsize = NULL,
-        cores = 1, type = "factor", alpha = 0.95){
+rgd = \(formula, data, discvar = NULL, discnum = 10,
+        minsize = 1, cores = 1, type = "factor", alpha = 0.95){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
-  yname = formula.vars[1]
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
   if (formula.vars[2] != "."){
     data = dplyr::select(data,dplyr::all_of(formula.vars))
   }
+  yname = formula.vars[1]
+  if (is.null(discvar)) {
+    discvar = colnames(data)[-which(colnames(data) == yname)]
+  }
   discdf =  dplyr::select(data,dplyr::all_of(c(yname,discvar)))
-  if (is.null(discnum)) {discnum = rep(10,length(discvar))}
+  if (length(discnum)==1) {discnum = rep(discnum,length(discvar))}
   g = robust_disc(paste0(yname,'~',paste0(discvar,collapse = '+')),
                   discdf, discnum, minsize, cores = cores)
   discedvar = colnames(data[,-which(colnames(data) %in% discvar)])

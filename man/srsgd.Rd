@@ -42,11 +42,8 @@ that all input variable data in srsgd must \emph{be discretized prior to use}.
 \examples{
 data('srs_table')
 data('srs_wt')
-srsgd(d ~ a1 + a2 + a3, data = srs_table, wt = srs_wt)
-srsgd(d ~ a1 + a2 + a3, data = srs_table,
-      wt = srs_wt, type = 'interaction')
-srsgd(d ~ a1 + a2 + a3, data = srs_table,
-      wt = srs_wt, type = 'ecological')
+srsgd(d ~ a1 + a2 + a3, data = srs_table, wt = srs_wt,
+      type = c('factor','interaction','ecological'))
 
 }
 \references{

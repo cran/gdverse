@@ -7,9 +7,9 @@
 rgd(
   formula,
   data,
-  discvar,
-  discnum = NULL,
-  minsize = NULL,
+  discvar = NULL,
+  discnum = 10,
+  minsize = 1,
   cores = 1,
   type = "factor",
   alpha = 0.95
@@ -21,7 +21,8 @@ rgd(
 \item{data}{A data.frame, tibble or sf object of observation data.}
 
 \item{discvar}{Name of continuous variable columns that need to be discretized. Noted that
-when \code{formula} has \code{discvar}, \code{data} must have these columns.}
+when \code{formula} has \code{discvar}, \code{data} must have these columns. By default, all independent
+variables are used as \code{discvar}.}
 
 \item{discnum}{A numeric vector of discretized classes of columns that need to be discretized.
 Default all \code{discvar} use \code{10}.}
@@ -50,7 +51,7 @@ Function for robust geographical detector(RGD) model.
 }
 \note{
 Please set up python dependence and configure \code{GDVERSE_PYTHON} environment variable if you want to run \code{rgd()}.
-See \code{vignette('RGDRID',package = 'gdverse')} for more details.
+See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 }
 \examples{
 \dontrun{

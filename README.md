@@ -5,9 +5,10 @@
 
 <!-- badges: start -->
 
-[![CRAN](https://www.r-pkg.org/badges/version/gdverse)](https://CRAN.R-project.org/package=gdverse)
-[![Downloads](https://cranlogs.r-pkg.org/badges/gdverse)](https://CRAN.R-project.org/package=gdverse)
-[![r-universe](https://ausgis.r-universe.dev/badges/gdverse)](https://ausgis.r-universe.dev/gdverse)
+[![cran](https://www.r-pkg.org/badges/version/gdverse)](https://CRAN.R-project.org/package=gdverse)
+[![downloads_all](https://badgen.net/cran/dt/gdverse?color=orange)](https://CRAN.R-project.org/package=gdverse)
+[![downloads_month](https://cranlogs.r-pkg.org/badges/gdverse)](https://CRAN.R-project.org/package=gdverse)
+[![r-universe](https://ausgis.r-universe.dev/badges/gdverse?color=cyan)](https://ausgis.r-universe.dev/gdverse)
 
 <!-- badges: end -->
 
@@ -104,9 +105,11 @@ ndvi
 ### OPGD model
 
 ``` r
+discvar = names(ndvi)[-1:-3]
+discvar
+## [1] "Tempchange"    "Precipitation" "GDP"           "Popdensity"
 ndvi_opgd = opgd(NDVIchange ~ ., data = ndvi, 
-                 discvar = names(ndvi)[-1:-3],
-                 cores = 6, type ='factor')
+                 discvar = discvar, cores = 6)
 ndvi_opgd
 ##                 OPGD Model                  
 ## ***          Factor Detector            
