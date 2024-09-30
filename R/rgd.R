@@ -15,20 +15,15 @@
 #' when `formula` has `discvar`, `data` must have these columns. By default, all independent
 #' variables are used as `discvar`.
 #' @param discnum A numeric vector of discretized classes of columns that need to be discretized.
-#' Default all `discvar` use `10`.
+#' Default all `discvar` use `3:22`.
 #' @param minsize (optional) The min size of each discretization group. Default all use `1`.
-#' @param cores (optional) Positive integer(default is 1). If cores > 1, use `python` `joblib` package to
-#' parallel computation.
-#' @param type (optional) The type of geographical detector, which must be `factor`(default),
-#' `interaction`, `risk`, `ecological`.You can run one or more types at one time.
-#' @param alpha (optional) Specifies the size of confidence level. Default is `0.95`.
+#' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
+#' multi-core parallel computing.
 #'
-#' @return A list of the RGD model result.
+#' @return A list.
 #' \describe{
-#' \item{\code{factor}}{the result of factor detector}
-#' \item{\code{interaction}}{the result of interaction detector}
-#' \item{\code{risk}}{the result of risk detector}
-#' \item{\code{ecological}}{the result of ecological detector}
+#' \item{\code{factor}}{the result of RGD model}
+#' \item{\code{disc}}{robust discrete results}
 #' }
 #' @export
 #'
@@ -36,11 +31,11 @@
 #' \dontrun{
 #' ## The following code needs to configure the Python environment to run:
 #' data('ndvi')
-#' g = rgd(NDVIchange ~ ., data = ndvi, discvar = names(ndvi)[-1:-3],
-#'         cores = 6, type =c('factor','interaction'))
+#' g = rgd(NDVIchange ~ ., data = ndvi,
+#'         discvar = names(ndvi)[-1:-3],
+#'         discnum = 3:8, cores = 6)
 #' }
-rgd = \(formula, data, discvar = NULL, discnum = 10,
-        minsize = 1, cores = 1, type = "factor", alpha = 0.95){
+rgd = \(formula, data, discvar = NULL, discnum = 3:22, minsize = 1, cores = 1){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
@@ -52,24 +47,25 @@ rgd = \(formula, data, discvar = NULL, discnum = 10,
     discvar = colnames(data)[-which(colnames(data) == yname)]
   }
   discdf =  dplyr::select(data,dplyr::all_of(c(yname,discvar)))
-  if (length(discnum)==1) {discnum = rep(discnum,length(discvar))}
-  g = robust_disc(paste0(yname,'~',paste0(discvar,collapse = '+')),
-                  discdf, discnum, minsize, cores = cores)
   discedvar = colnames(data[,-which(colnames(data) %in% discvar)])
-  newdata = data %>%
-    dplyr::select(dplyr::all_of(discedvar)) %>%
-    dplyr::bind_cols(g)
-  if (length(type) == 1){
-    res = gd(paste0(yname,' ~ .'),data = newdata,
-             type = type,alpha = alpha)
-  } else {
-    res = vector("list", length(type))
-    for (i in seq_along(type)){
-      res[[i]] = gd(paste0(yname,' ~ .'),data = newdata,
-                    type = type[i],alpha = alpha)[[1]]
-    }
-    names(res) = type
+
+  resqv = vector("list", length(discnum))
+  resdisc = vector("list", length(discnum))
+  for (i in seq_along(discnum)) {
+    g = robust_disc(paste0(yname,'~',paste0(discvar,collapse = '+')),
+                    discdf, discnum[i], minsize, cores = cores)
+    resdisc[[i]] = g
+    newdata = data %>%
+      dplyr::select(dplyr::all_of(discedvar)) %>%
+      dplyr::bind_cols(g)
+    resqv[[i]] = gd(paste0(yname,' ~ .'),data = newdata,type = "factor")[[1]]
   }
+  qv = purrr::map2_dfr(resqv, discnum,
+                       \(.x,.n) .x %>%
+                         dplyr::mutate(discnum = .n))
+  disc = purrr::map2_dfr(resdisc, discnum,
+                         \(.x,.n) dplyr::mutate(.x,discnum = .n))
+  res = list("factor" = qv, "disc" = disc)
   class(res) = "rgd_result"
   return(res)
 }
@@ -86,14 +82,14 @@ rgd = \(formula, data, discvar = NULL, discnum = 10,
 #' @method print rgd_result
 #' @export
 print.rgd_result = \(x, ...) {
-  cat("                 RGD Model                  \n")
-  nx = names(x)
-  for (i in seq_along(x)){
-    res = x[i]
-    class(res) = paste0(nx[i],"_detector")
-    print(res)
-    cat("\n")
-  }
+  cat("***          Robust Geographical Detector       ")
+  qv = x[[1]]
+  qv = qv %>%
+    dplyr::filter(discnum == max(qv$discnum)) %>%
+    dplyr::select(1:3)
+  print(knitr::kable(qv,format = "markdown",digits = 12,align = 'c',...))
+  cat("\n")
+  cat("#### Only display the results corresponding to the maximum number of discretizations!")
 }
 
 #' @title plot RGD result
@@ -102,27 +98,23 @@ print.rgd_result = \(x, ...) {
 #' S3 method to plot output for RGD model result in `rgd()`.
 #'
 #' @param x Return by `rgd()`.
-#' @param ... (optional) Other arguments passed to `patchwork::wrap_plots()`.
+#' @param slicenum (optional) The number of labels facing inward. Default is `2`.
+#' @param alpha (optional) Confidence level. Default is `0.95`.
+#' @param keep (optional) Whether to keep Q-value results for insignificant variables,
+#' default is `TRUE`.
+#' @param ... (optional) Other arguments passed to `ggplot2::theme()`.
 #'
 #' @return A ggplot2 layer
 #' @method plot rgd_result
 #' @export
 #'
-plot.rgd_result = \(x, ...) {
-  if (length(x) == 1){
-    res = x[1]
-    nx = names(x)
-    class(res) = paste0(nx[1],"_detector")
-    fig_p = plot(res)
-  } else {
-    fig_p = vector("list",length(x))
-    nx = names(x)
-    for (i in seq_along(x)){
-      res = x[i]
-      class(res) = paste0(nx[i],"_detector")
-      fig_p[[i]] = plot(res)
-    }
-    fig_p = patchwork::wrap_plots(fig_p, ncol = 2, ...)
-  }
+plot.rgd_result = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {
+  qv = x[[1]]
+  qv = qv %>%
+    dplyr::filter(discnum == max(qv$discnum)) %>%
+    dplyr::select(1:3)
+  res = list("factor" = qv)
+  class(res) = "factor_detector"
+  fig_p = plot.factor_detector(res, slicenum, alpha, keep, ...)
   return(fig_p)
 }

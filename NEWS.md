@@ -1,3 +1,17 @@
+# gdverse 1.0-3
+
+* Update the `RGD` Model API Settings (#2).
+
+* Fix bug caused by changes in default parameters of `opgd` in `sesu_opgd` (#4).
+
+* Maintain the same results for `st_unidisc` and `ClassInt::classify_intervals` (#5).
+
+* The parameter `overlaymethod` in `rid` and `idsa` has been renamed to `overlay`.
+
+* Add `readr` as a dependence of type `Suggests`.
+
+* Recompile vignettes due to internal function changes.
+
 # gdverse 1.0-2
 
 * When the `discvar` input for the `opgd`, `rgd`, `rid`, `spade` functions is `NULL`, 

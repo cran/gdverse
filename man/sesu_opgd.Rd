@@ -9,8 +9,9 @@ sesu_opgd(
   datalist,
   su,
   discvar,
-  discnum = NULL,
-  discmethod = NULL,
+  discnum = 3:22,
+  discmethod = c("sd", "equal", "pretty", "quantile", "fisher", "headtails", "maximum",
+    "box"),
   cores = 1,
   increase_rate = 0.05,
   alpha = 0.95,
@@ -32,8 +33,8 @@ when \code{formula} has \code{discvar}, \code{data} must have these columns.}
 \item{discmethod}{(optional) A vector of methods for discretization,default is used
 \code{c("sd","equal","pretty","quantile","fisher","headtails","maximum","box")}in \code{gdverse}.}
 
-\item{cores}{(optional) A positive integer(default is 1). If cores > 1, a 'parallel' package
-cluster with that many cores is created and used. You can also supply a cluster object.}
+\item{cores}{(optional) Positive integer (default is 1). When cores are greater than 1, use
+multi-core parallel computing.}
 
 \item{increase_rate}{(optional) The critical increase rate of the number of discretization.
 Default is \verb{5\%}.}
@@ -43,10 +44,11 @@ Default is \verb{5\%}.}
 \item{...}{(optional) Other arguments passed to \code{gd_bestunidisc()}.}
 }
 \value{
-A list with SESU OPGD results
+A list.
 \describe{
 \item{\code{sesu}}{a tibble representing size effects of spatial units}
 \item{\code{optsu}}{optimal spatial unit}
+\item{\code{increase_rate}}{the critical increase rate of q value}
 }
 }
 \description{
@@ -55,7 +57,7 @@ optimal parameters geographical detector(OPGD) model.
 }
 \details{
 Firstly, the \code{OPGD} model is executed for each data in the datalist (all \code{significant}
-Q statistic of each data are averaged to represent the spatial connection strength under
+Q statistic of each data are averaged to represent the spatial association strength under
 this spatial unit), and then the \code{loess_optscale} function is used to select the optimal
 spatial analysis scale.
 }

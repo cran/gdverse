@@ -10,7 +10,7 @@
 #' doi: 10.1080/15481603.2020.1760434.
 #' @details
 #' Firstly, the `OPGD` model is executed for each data in the datalist (all `significant`
-#' Q statistic of each data are averaged to represent the spatial connection strength under
+#' Q statistic of each data are averaged to represent the spatial association strength under
 #' this spatial unit), and then the `loess_optscale` function is used to select the optimal
 #' spatial analysis scale.
 #'
@@ -22,17 +22,18 @@
 #' @param discnum (optional) A vector of number of classes for discretization. Default is `3:22`.
 #' @param discmethod (optional) A vector of methods for discretization,default is used
 #' `c("sd","equal","pretty","quantile","fisher","headtails","maximum","box")`in `gdverse`.
-#' @param cores (optional) A positive integer(default is 1). If cores > 1, a 'parallel' package
-#' cluster with that many cores is created and used. You can also supply a cluster object.
+#' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
+#' multi-core parallel computing.
 #' @param increase_rate (optional) The critical increase rate of the number of discretization.
 #' Default is `5%`.
 #' @param alpha (optional) Specifies the size of confidence level. Default is `0.95`.
 #' @param ... (optional) Other arguments passed to `gd_bestunidisc()`.
 #'
-#' @return A list with SESU OPGD results
+#' @return A list.
 #' \describe{
 #' \item{\code{sesu}}{a tibble representing size effects of spatial units}
 #' \item{\code{optsu}}{optimal spatial unit}
+#' \item{\code{increase_rate}}{the critical increase rate of q value}
 #' }
 #' @export
 #'
@@ -55,11 +56,12 @@
 #'           discvar = names(select(fvc5000,-c(fvc,lulc))),
 #'           cores = 6)
 #' }
-sesu_opgd = \(formula,datalist,su,discvar,discnum = NULL,discmethod = NULL,
+sesu_opgd = \(formula,datalist,su,discvar,discnum = 3:22,
+              discmethod = c("sd","equal","pretty","quantile","fisher","headtails","maximum","box"),
               cores = 1, increase_rate = 0.05, alpha = 0.95, ...){
   res_sesu = purrr::map2(datalist, su,
-                         \(.tbf, .spsu) opgd(formula,.tbf,discvar,discnum,
-                                             discmethod,cores,type = "factor",
+                         \(.tbf, .spsu) opgd(formula, .tbf, discvar, discnum,
+                                             discmethod, cores, type = "factor",
                                              alpha = alpha, ...) %>%
                                 purrr::pluck('factor') %>%
                                 dplyr::mutate(su = .spsu))
@@ -71,7 +73,8 @@ sesu_opgd = \(formula,datalist,su,discvar,discnum = NULL,discmethod = NULL,
     dplyr::group_by(su) %>%
     dplyr::summarise(qv = mean(`Q-statistic`,na.rm = T))
   optsu = loess_optscale(optsu$qv,optsu$su,increase_rate)
-  res = list('sesu' = sesu,'optsu' = optsu)
+  res = list('sesu' = sesu,'optsu' = optsu[1],
+             'increase_rate' = optsu[2])
   class(res) = 'sesu_opgd'
   return(res)
 }
@@ -91,8 +94,7 @@ sesu_opgd = \(formula,datalist,su,discvar,discnum = NULL,discmethod = NULL,
 print.sesu_opgd = \(x,...){
   g = purrr::list_rbind(x$sesu$sesu_result)
   spunits = x$sesu$spatial_units
-  cat("      Size Effect Of Spatial Units      \n",
-      "              OPGD Model                \n",
+  cat("   Size Effect Of Spatial Units Using OPGD Model   \n",
       "***    Optimal Spatial Unit:",x$optsu)
   for (i in spunits){
     cat(sprintf("\n Spatial Unit: %s ",i))

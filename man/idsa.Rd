@@ -10,7 +10,7 @@ idsa(
   wt = NULL,
   discnum = 3:22,
   discmethod = "quantile",
-  overlaymethod = "and",
+  overlay = "and",
   strategy = 2L,
   increase_rate = 0.05,
   cores = 1,
@@ -32,7 +32,7 @@ idsa(
 Noted that \code{robust} will use \code{robust_disc()}; \code{rpart} will use \code{rpart_disc()};
 Others use \code{st_unidisc()}. You can try \code{unidisc_methods()} to see supported methods in \code{st_unidisc()}.}
 
-\item{overlaymethod}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
+\item{overlay}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
 Default is \code{and}.}
 
 \item{strategy}{(optional) Discretization strategy. When \code{strategy} is \code{1L}, choose the highest SPADE model q-statistics to
@@ -42,9 +42,8 @@ spatial data are selected by combining LOESS model.}
 \item{increase_rate}{(optional) The critical increase rate of the number of discretization.
 Default is \verb{5\%}.}
 
-\item{cores}{(optional) A positive integer(default is 1). If cores > 1, a 'parallel' package
-cluster with that many cores is created and used. You can also supply a cluster
-object.}
+\item{cores}{(optional) Positive integer (default is 1). When cores are greater than 1, use
+multi-core parallel computing.}
 
 \item{seed}{(optional) Random number seed, default is \code{123456789}.}
 
@@ -53,7 +52,7 @@ object.}
 \item{...}{(optional) Other arguments passed to \code{cpsd_disc()}.}
 }
 \value{
-A list with PID values tibble under different spatial overlays and performance evaluation indicators.
+A list.
 \describe{
 \item{\code{interaction}}{the interaction result of IDSA model}
 \item{\code{risk1}}{whether values of the response variable between a pair of overlay zones are significantly different}

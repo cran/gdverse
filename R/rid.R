@@ -7,7 +7,6 @@
 #' A case of road life expectancy analysis. Spatial Statistics, 59(100814), 100814.
 #' https://doi.org/10.1016/j.spasta.2024.100814
 #' @note
-#' For bivariate spatial interactions, use the `RGD` function and specify the `type` parameter as `interaction`.
 #'
 #' The RID model requires at least \eqn{2^n-1} calculations when has \eqn{n} explanatory variables.
 #' When there are more than 10 explanatory variables, carefully consider the computational burden of this model.
@@ -24,12 +23,13 @@
 #' variables are used as `discvar`.
 #' @param discnum A numeric vector for the number of discretized classes of columns that need
 #' to be discretized. Default all `discvar` use `10`.
-#' @param overlaymethod (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
-#' Default is `and`.
+#' @param overlay (optional) Spatial overlay method. One of `and`, `or`, `intersection`.
+#' Default is `intersection`.
 #' @param minsize (optional) The min size of each discretization group. Default all use `1`.
-#' @param cores (optional) Positive integer(default is 1). If cores > 1, use parallel computation.
+#' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
+#' multi-core parallel computing.
 #'
-#' @return A list of the RID model result.
+#' @return A list.
 #' \describe{
 #' \item{\code{interaction}}{the result of RID model}
 #' }
@@ -39,12 +39,13 @@
 #' \dontrun{
 #' ## The following code needs to configure the Python environment to run:
 #' data('sim')
-#' g = rid(y ~ ., data = sim %>% dplyr::select(-dplyr::any_of(c('lo','la'))),
-#'         discvar = c("xa","xb","xc"), discnum = 4, cores = 6)
+#' g = rid(y ~ .,
+#'         data =  dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
+#'         discnum = 4, cores = 6)
 #' g
 #' }
 rid = \(formula, data, discvar = NULL, discnum = 10,
-        overlaymethod = 'and', minsize = 1, cores = 1){
+        overlay = 'intersection', minsize = 1, cores = 1){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   yname = formula.vars[1]
@@ -58,7 +59,7 @@ rid = \(formula, data, discvar = NULL, discnum = 10,
   if (is.null(discvar)) {
     discvar = xname
   }
-  discdf =  dplyr::select(dti,dplyr::all_of(c(yname,discvar)))
+  discdf = dplyr::select(dti,dplyr::all_of(c(yname,discvar)))
   if (length(discnum)==0) {discnum = rep(discnum,length(discvar))}
   g = robust_disc(paste0(yname,'~',paste0(discvar,collapse = '+')),
                   discdf, discnum, minsize, cores = cores)
@@ -67,7 +68,7 @@ rid = \(formula, data, discvar = NULL, discnum = 10,
     dplyr::select(dplyr::all_of(discedvar)) %>%
     dplyr::bind_cols(g)
   xs = generate_subsets(xname,empty = FALSE, self = TRUE)
-  spfom = overlaymethod
+  spfom = overlay
 
   interact_pd = \(xvar){
     if (spfom == 'intersection'){
@@ -79,7 +80,7 @@ rid = \(formula, data, discvar = NULL, discnum = 10,
                                 newdti,spfom)
     }
     qv = factor_detector(newdti[,yname,drop = TRUE],reszone)[[1]]
-    names(qv) = 'qv_rid'
+    names(qv) = 'PD'
     return(qv)
   }
 
@@ -103,7 +104,7 @@ rid = \(formula, data, discvar = NULL, discnum = 10,
   xsname = purrr::map_chr(xs,\(.x) paste(.x,collapse = IntersectionSymbol))
   out_g = tibble::tibble(varibale = xsname) %>%
     dplyr::bind_cols(out_g) %>%
-    dplyr::arrange(dplyr::desc(qv_rid))
+    dplyr::arrange(dplyr::desc(PD))
   res = list("interaction" = out_g)
   class(res) = "rid_result"
   return(res)
@@ -121,6 +122,7 @@ rid = \(formula, data, discvar = NULL, discnum = 10,
 #' @export
 print.rid_result = \(x, ...) {
   cat("***          Robust Interaction Detector       ")
-  print(knitr::kable(dplyr::rename(x$interaction, PD = qv_rid),
-                     format = "markdown",digits = 12,align = 'c',...))
+  print(knitr::kable(utils::head(x$interaction,5), format = "markdown",
+                     digits = 12, align = 'c', ...))
+  cat("\n #### Only the first five pairs of interactions are displayed! ####")
 }

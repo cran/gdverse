@@ -20,15 +20,17 @@ gdverse_pyinit = function() {
     reticulate::use_python(gdverse_python)
     if (!all(purrr::map_lgl(
       c('numpy','pandas','ruptures','joblib'),
-      reticulate::py_module_available))) {
+      reticulate::py_module_available)
+      )) {
       stop('python dependencies for gdverse cannot be loaded properly.')
     }
   } else if (!all(purrr::map_lgl(
     c('numpy','pandas','ruptures','joblib'),
-    reticulate::py_module_available))) {
+    reticulate::py_module_available)
+    )) {
     stop('python dependencies for gdverse cannot be loaded properly.')
   } else {
     message("\n", "Please set `GDVERSE_PYTHON` environment variable to appropriate python path!")
-    message("\n", "Run `vignette('RGDRID',package = 'gdverse')` to see more details")
+    message("\n", "Run `vignette('rgdrid',package = 'gdverse')` to see more details")
   }
 }

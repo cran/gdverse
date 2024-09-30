@@ -1,6 +1,6 @@
 Package: gdverse
 Title: Analysis of Spatial Stratified Heterogeneity
-Version: 1.0-2
+Version: 1.0-3
 Authors@R: c(
       person(given = "Wenbo", family = "Lv",
              email = "lyu.geosocial@gmail.com", 
@@ -38,13 +38,14 @@ Depends: R (>= 4.1.0)
 Imports: classInt, dplyr, forcats, geosphere, ggplot2, magrittr,
         parallel, patchwork, purrr, reticulate, rpart, scatterpie,
         sdsfun, sf, stats, tibble, tidyr, utils
-Suggests: cowplot, knitr, Rcpp, rmarkdown, terra, testthat (>= 3.0.0)
+Suggests: cowplot, knitr, Rcpp, readr, rmarkdown, terra, testthat (>=
+        3.0.0)
 LinkingTo: Rcpp
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2024-09-23 04:47:38 UTC; dell
+Packaged: 2024-09-30 02:09:18 UTC; dell
 Author: Wenbo Lv [aut, cre, cph] (<https://orcid.org/0009-0002-6003-3800>),
   Yangyang Lei [aut] (<https://orcid.org/0009-0002-6518-3613>),
   Yongze Song [aut] (<https://orcid.org/0000-0003-3420-9622>),
@@ -52,4 +53,4 @@ Author: Wenbo Lv [aut, cre, cph] (<https://orcid.org/0009-0002-6003-3800>),
   Jianwu Yan [aut] (<https://orcid.org/0000-0001-9411-8453>)
 Maintainer: Wenbo Lv <lyu.geosocial@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-09-23 05:10:02 UTC
+Date/Publication: 2024-09-30 03:00:02 UTC

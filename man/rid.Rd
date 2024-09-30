@@ -9,7 +9,7 @@ rid(
   data,
   discvar = NULL,
   discnum = 10,
-  overlaymethod = "and",
+  overlay = "intersection",
   minsize = 1,
   cores = 1
 )
@@ -26,15 +26,16 @@ variables are used as \code{discvar}.}
 \item{discnum}{A numeric vector for the number of discretized classes of columns that need
 to be discretized. Default all \code{discvar} use \code{10}.}
 
-\item{overlaymethod}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
-Default is \code{and}.}
+\item{overlay}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
+Default is \code{intersection}.}
 
 \item{minsize}{(optional) The min size of each discretization group. Default all use \code{1}.}
 
-\item{cores}{(optional) Positive integer(default is 1). If cores > 1, use parallel computation.}
+\item{cores}{(optional) Positive integer (default is 1). When cores are greater than 1, use
+multi-core parallel computing.}
 }
 \value{
-A list of the RID model result.
+A list.
 \describe{
 \item{\code{interaction}}{the result of RID model}
 }
@@ -43,8 +44,6 @@ A list of the RID model result.
 Function for robust interaction detector(RID) model.
 }
 \note{
-For bivariate spatial interactions, use the \code{RGD} function and specify the \code{type} parameter as \code{interaction}.
-
 The RID model requires at least \eqn{2^n-1} calculations when has \eqn{n} explanatory variables.
 When there are more than 10 explanatory variables, carefully consider the computational burden of this model.
 When there are a large number of explanatory variables, the data dimensionality reduction method can be used
@@ -57,8 +56,9 @@ See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 \dontrun{
 ## The following code needs to configure the Python environment to run:
 data('sim')
-g = rid(y ~ ., data = sim \%>\% dplyr::select(-dplyr::any_of(c('lo','la'))),
-        discvar = c("xa","xb","xc"), discnum = 4, cores = 6)
+g = rid(y ~ .,
+        data =  dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
+        discnum = 4, cores = 6)
 g
 }
 }
