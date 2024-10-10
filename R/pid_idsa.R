@@ -16,7 +16,7 @@
 #' @param discnum (optional) A vector of number of classes for discretization. Default is `3:22`.
 #' @param discmethod (optional) The discretization methods. Default all use `quantile`.
 #' Noted that `robust` will use `robust_disc()`; `rpart` will use `rpart_disc()`;
-#' Others use `st_unidisc()`. You can try `unidisc_methods()`.
+#' Others use `sdsfun::discretize_vector()`.
 #' @param strategy (optional) Discretization strategy. When `strategy` is `1L`, choose the highest SPADE model q-statistics to
 #' determinate optimal spatial data discretization parameters. When `strategy` is `2L`, The optimal discrete parameters of
 #' spatial data are selected by combining LOESS model.
@@ -97,11 +97,11 @@ cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strat
       #                      cores = cores_rdisc,
       #                      ...)
       # xdisc = xdisc[,1,drop = TRUE]
-      q = 0.01 * paramgd[[2]] ### Subsequent confirmation is required
+      q = 0.01 * paramgd[[2]] # Subsequent confirmation is required
     } else {
-      xdisc = st_unidisc(xobs, k = paramgd[[2]],
-                         method = paramgd[[3]],
-                         seed = seed, ...)
+      xdisc = sdsfun::discretize_vector(xobs, n = paramgd[[2]],
+                                        method = paramgd[[3]],
+                                        seed = seed, ...)
       q = cpsd_spade(response,xobs,xdisc,wtn)
     }
 
@@ -110,8 +110,8 @@ cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strat
   }
 
   if (doclust) {
-    parallel::clusterExport(cores,c('st_unidisc','robust_disc','rpart_disc',
-                                    'psd_spade','cpsd_spade','spvar'))
+    parallel::clusterExport(cores,c('robust_disc','rpart_disc',
+                                    'psd_spade','cpsd_spade'))
     out_g = parallel::parLapply(cores,parak,calcul_disc,...)
     out_g = tibble::as_tibble(do.call(rbind, out_g))
   } else {
@@ -130,7 +130,7 @@ cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strat
     out_g = dplyr::bind_cols(paradf,out_g)
     out_param = tidyr::expand(out_g,tidyr::nesting(x,method))
     optimalk = out_param$x %>%
-      purrr::map2_dbl(out_param$method, \(.x,.method) loess_optdiscnum(
+      purrr::map2_dbl(out_param$method, \(.x,.method) sdsfun::loess_optnum(
         out_g[which(out_g$x==.x & out_g$method==.method),"spade_cpsd",drop = TRUE],
         out_g[which(out_g$x==.x & out_g$method==.method),"k",drop = TRUE],increase_rate)[1])
     out_g = out_param %>%
@@ -155,9 +155,9 @@ cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strat
                             ...)
         xdisc = xdisc[,1,drop = TRUE]
       } else {
-        xdisc = st_unidisc(xobs, k = k,
-                           method = method,
-                           seed = seed, ...)
+        xdisc = sdsfun::discretize_vector(xobs, n = k,
+                                          method = method,
+                                          seed = seed, ...)
       }
       return(xdisc)
     }
@@ -190,14 +190,14 @@ cpsd_disc =  \(formula, data, wt, discnum = 3:22, discmethod = "quantile", strat
 #' @examples
 #' data('sim')
 #' wt = inverse_distance_weight(sim$lo,sim$la)
-#' sim1 = dplyr::mutate(sim,dplyr::across(xa:xc,\(.x) st_unidisc(.x,5)))
-#' sz = st_fuzzyoverlay(y ~ xa + xb + xc, data = sim1)
+#' sim1 = dplyr::mutate(sim,dplyr::across(xa:xc,\(.x) sdsfun::discretize_vector(.x,5)))
+#' sz = sdsfun::fuzzyoverlay(y ~ xa + xb + xc, data = sim1)
 #' psd_iev(dplyr::select(sim1,xa:xc),sz,wt)
 #'
 psd_iev = \(discdata,spzone,wt){
   xname = names(discdata)
   totalsv = purrr::map_dbl(discdata,
-                           \(.x) spvar(.x, wt))
+                           \(.x) sdsfun::spvar(.x, wt))
   qv = purrr::map_dbl(discdata,
                       \(.y) psd_spade(.y,spzone,wt)) %>%
     {(-1*. + 1)*totalsv}
@@ -221,7 +221,7 @@ psd_iev = \(discdata,spzone,wt){
 #' @examples
 #' data('sim')
 #' wt = inverse_distance_weight(sim$lo,sim$la)
-#' sim1 = dplyr::mutate(sim,dplyr::across(xa:xc,\(.x) st_unidisc(.x,5)))
+#' sim1 = dplyr::mutate(sim,dplyr::across(xa:xc,\(.x) sdsfun::discretize_vector(.x,5)))
 #' pid_idsa(y ~ xa + xb + xc, rawdata = sim,
 #'          discdata = sim1, wt = wt)
 #'
@@ -239,7 +239,7 @@ pid_idsa = \(formula, rawdata, discdata,
       dplyr::select(-dplyr::any_of(yname)) %>%
       purrr::reduce(paste,sep = '_')
   } else {
-    fuzzyzone = st_fuzzyoverlay(formula,discdata,overlaymethod)
+    fuzzyzone = sdsfun::fuzzyoverlay(formula,discdata,overlaymethod)
   }
 
   qtheta = psd_spade(rawdata[,yname,drop = TRUE],
