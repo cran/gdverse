@@ -22,7 +22,7 @@ NULL
 #' @param locx The x axis location.
 #' @param locy The y axis location.
 #' @param power (optional) Default is 1. Set to 2 for gravity weights.
-#' @param is_arc (optional) FALSE (default) or TRUE, whether to compute arc distance.
+#' @param is_arc (optional) `FALSE` (default) or `TRUE`, whether to compute arc distance.
 #'
 #' @return A inverse distance weight matrices with class of `matrix`.
 #' @export
@@ -69,35 +69,15 @@ shuffle_vector = \(x,shuffle_rate,seed = 123456789){
   }
 }
 
-#' @title rescale continuous vector to specified minimum and maximum
-#'
-#' @param x A continuous numeric vector.
-#' @param to_left (optional) Specified minimum. Default is `0`.
-#' @param to_right (optional) Specified maximum. Default is `1`.
-#'
-#' @return A continuous vector.
-#' @export
-#'
-#' @examples
-#' rescale_vector(c(-5,1,5),0.01,0.99)
-#'
-rescale_vector = \(x,to_left = 0,to_right = 1){
-  xmin = range(x,na.rm = TRUE)[1]
-  xmax = range(x,na.rm = TRUE)[2]
-  xnew = (x - xmin) / (xmax - xmin) * (to_right - to_left) + to_left
-  return(xnew)
-}
-
 #' @title generate subsets of a set
 #'
-#' @param set A vector
-#' including the empty set and the set itself. Default is `TRUE`.
+#' @param set A vector.
 #' @param empty (optional) When `empty` is `TRUE`, the generated subset includes the empty set,
 #' otherwise the empty set is removed. Default is `TRUE`.
 #' @param self (optional) When `self` is `TRUE`, the resulting subset includes the set itself,
 #' otherwise the set itself is removed. Default is `TRUE`.
 #'
-#' @return A list with the subsets
+#' @return A list.
 #' @export
 #'
 #' @examples
@@ -143,7 +123,7 @@ weight_assign = \(x,w,list = FALSE){
 #'
 #' @param x A discretized vector.
 #'
-#' @return An integer vector
+#' @return An integer vector.
 #' @export
 #'
 #' @examples
@@ -154,9 +134,7 @@ all2int = \(x){
   if (inherits(x,"factor")){
     x = as.integer(x)
   } else if (inherits(x,'character')) {
-    x = x %>%
-      as.factor() %>%
-      as.integer()
+    x = as.integer(as.factor(x))
   }
   return(x)
 }
