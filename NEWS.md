@@ -1,3 +1,18 @@
+# gdverse 1.2
+
+* Set the default number of discretizations in gdverse to range from 3 to 8 (#15).
+
+* Optimize the Python integration setup in gdverse (#14).
+
+* Now `opgd()` returns optimal discretization parameters (#13).
+
+* Force `data` to `tibble` format in **gdverse** GDMs model function (#12).
+
+* Align the RID model and algorithm with the original framework presented in paper (#9).
+
+* Beautify the narrative and other writing details in the vignettes, without making 
+  any changes at the user level.
+
 # gdverse 1.1-1
 
 * Clear the `WORDLIST` to ensure the source code remains clean and organized.

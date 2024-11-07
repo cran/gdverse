@@ -18,17 +18,17 @@
 
 Current models and functions provided by **gdverse** are:
 
-| *geodetector model* | *gdverse function* | *support status* |
-|---------------------|--------------------|------------------|
-| **GD**              | `gd()`             | ✔️               |
-| **OPGD**            | `opgd()`           | ✔️               |
-| **GOZH**            | `gozh()`           | ✔️               |
-| **LESH**            | `lesh()`           | ✔️               |
-| **SPADE**           | `spade()`          | ✔️               |
-| **IDSA**            | `idsa()`           | ✔️               |
-| **RGD**             | `rgd()`            | ✔️               |
-| **RID**             | `rid()`            | ✔️               |
-| **SRSGD**           | `srsgd()`          | ✔️               |
+| *Model* | *Function* | *Support* |
+|----|----|----|
+| [GD](https://doi.org/10.1080/13658810802443457) | `gd()` | ✔️ |
+| [OPGD](https://doi.org/10.1080/15481603.2020.1760434) | `opgd()` | ✔️ |
+| [GOZH](https://doi.org/10.1016/j.isprsjprs.2022.01.009) | `gozh()` | ✔️ |
+| [LESH](https://doi.org/10.1080/17538947.2023.2271883) | `lesh()` | ✔️ |
+| [SPADE](https://doi.org/10.1080/13658816.2018.1476693) | `spade()` | ✔️ |
+| [IDSA](https://doi.org/10.1080/13658816.2021.1882680) | `idsa()` | ✔️ |
+| [RGD](https://doi.org/10.1016/j.jag.2022.102782) | `rgd()` | ✔️ |
+| [RID](https://doi.org/10.1016/j.spasta.2024.100814) | `rid()` | ✔️ |
+| [SRSGD](https://doi.org/10.1016/j.ins.2021.12.019) | `srsgd()` | ✔️ |
 
 <div class="figure" style="text-align: center">
 
@@ -116,12 +116,12 @@ ndvi_opgd
 ## 
 ## |   variable    | Q-statistic | P-value  |
 ## |:-------------:|:-----------:|:--------:|
-## | Precipitation |  0.8842705  | 8.58e-10 |
+## | Precipitation |  0.8693505  | 2.58e-10 |
 ## |  Climatezone  |  0.8218335  | 7.34e-10 |
-## |  Tempchange   |  0.3618595  | 3.31e-10 |
-## |  Popdensity   |  0.2203510  | 9.65e-10 |
+## |  Tempchange   |  0.3330256  | 1.89e-10 |
+## |  Popdensity   |  0.1990773  | 6.60e-11 |
 ## |    Mining     |  0.1411154  | 6.73e-10 |
-## |      GDP      |  0.1270466  | 2.00e-09 |
+## |      GDP      |  0.1004568  | 3.07e-10 |
 ```
 
 ### GOZH model

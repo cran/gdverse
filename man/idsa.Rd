@@ -8,7 +8,7 @@ idsa(
   formula,
   data,
   wt = NULL,
-  discnum = 3:22,
+  discnum = 3:8,
   discmethod = "quantile",
   overlay = "and",
   strategy = 2L,
@@ -22,11 +22,11 @@ idsa(
 \arguments{
 \item{formula}{A formula of IDSA model.}
 
-\item{data}{A data.frame, tibble or sf object of observation data.}
+\item{data}{A \code{data.frame}, \code{tibble} or \code{sf} object of observation data.}
 
 \item{wt}{(optional) The spatial weight matrix. When \code{data} is not an \code{sf} object, must provide \code{wt}.}
 
-\item{discnum}{(optional) Number of multilevel discretization. Default will use \code{3:22}.}
+\item{discnum}{(optional) Number of multilevel discretization. Default will use \code{3:8}.}
 
 \item{discmethod}{(optional) The discretization methods. Default all use \code{quantile}.
 Noted that \code{robust} will use \code{robust_disc()}; \code{rpart} will use \code{rpart_disc()};
@@ -55,8 +55,7 @@ multi-core parallel computing.}
 A list.
 \describe{
 \item{\code{interaction}}{the interaction result of IDSA model}
-\item{\code{risk1}}{whether values of the response variable between a pair of overlay zones are significantly different}
-\item{\code{risk2}}{risk detection result of the input data}
+\item{\code{risk}}{whether values of the response variable between a pair of overlay zones are significantly different}
 \item{\code{number_individual_explanatory_variables}}{the number of individual explanatory variables used for examining the interaction effects}
 \item{\code{number_overlay_zones}}{the number of overlay zones}
 \item{\code{percentage_finely_divided_zones}}{the percentage of finely divided zones that are determined by the interaction of variables}

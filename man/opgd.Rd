@@ -8,7 +8,7 @@ opgd(
   formula,
   data,
   discvar = NULL,
-  discnum = 3:22,
+  discnum = 3:8,
   discmethod = c("sd", "equal", "geometric", "quantile", "natural"),
   cores = 1,
   type = "factor",
@@ -19,13 +19,13 @@ opgd(
 \arguments{
 \item{formula}{A formula of OPGD model.}
 
-\item{data}{A data.frame, tibble or sf object of observation data.}
+\item{data}{A \code{data.frame}, \code{tibble} or \code{sf} object of observation data.}
 
 \item{discvar}{Name of continuous variable columns that need to be discretized. Noted that
 when \code{formula} has \code{discvar}, \code{data} must have these columns. By default, all independent
 variables are used as \code{discvar}.}
 
-\item{discnum}{(optional) A vector of number of classes for discretization. Default is \code{3:22}.}
+\item{discnum}{(optional) A vector of number of classes for discretization. Default is \code{3:8}.}
 
 \item{discmethod}{(optional) A vector of methods for discretization, default is using
 \code{c("sd","equal","geometric","quantile","natural")} by invoking \code{sdsfun}.}
@@ -33,10 +33,10 @@ variables are used as \code{discvar}.}
 \item{cores}{(optional) Positive integer (default is 1). When cores are greater than 1, use
 multi-core parallel computing.}
 
-\item{type}{(optional) The type of geographical detector,which must be \code{factor}(default),
+\item{type}{(optional) The type of geographical detector, which must be \code{factor}(default),
 \code{interaction}, \code{risk}, \code{ecological}. You can run one or more types at one time.}
 
-\item{alpha}{(optional) Specifies the size of confidence level.Default is \code{0.95}.}
+\item{alpha}{(optional) Specifies the size of confidence level. Default is \code{0.95}.}
 
 \item{...}{(optional) Other arguments passed to \code{gd_bestunidisc()}. A useful parameter is \code{seed},
 which is used to set the random number seed.}
@@ -44,6 +44,7 @@ which is used to set the random number seed.}
 \value{
 A list.
 \describe{
+\item{\code{opt_param}}{optimal discretization parameter}
 \item{\code{factor}}{the result of factor detector}
 \item{\code{interaction}}{the result of interaction detector}
 \item{\code{risk}}{the result of risk detector}

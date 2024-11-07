@@ -1,6 +1,6 @@
 Package: gdverse
 Title: Analysis of Spatial Stratified Heterogeneity
-Version: 1.1-1
+Version: 1.2
 Authors@R: c(
       person(given = "Wenbo", family = "Lv",
              email = "lyu.geosocial@gmail.com", 
@@ -47,7 +47,7 @@ VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2024-10-17 05:42:28 UTC; dell
+Packaged: 2024-11-07 06:45:26 UTC; dell
 Author: Wenbo Lv [aut, cre, cph] (<https://orcid.org/0009-0002-6003-3800>),
   Yangyang Lei [aut] (<https://orcid.org/0009-0002-6518-3613>),
   Fangmei Liu [aut] (<https://orcid.org/0009-0008-8634-7588>),
@@ -56,4 +56,4 @@ Author: Wenbo Lv [aut, cre, cph] (<https://orcid.org/0009-0002-6003-3800>),
   Jianwu Yan [aut] (<https://orcid.org/0000-0001-9411-8453>)
 Maintainer: Wenbo Lv <lyu.geosocial@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-10-17 06:00:03 UTC
+Date/Publication: 2024-11-07 07:00:01 UTC

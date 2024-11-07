@@ -15,7 +15,7 @@
 #' that all input variable data in srsgd must *be discretized prior to use*.
 #'
 #' @param formula A formula of spatial rough set-based geographical detector model.
-#' @param data A data.frame, tibble or sf object of observation data.
+#' @param data A `data.frame`, `tibble` or `sf` object of observation data.
 #' @param wt Spatial adjacency matrix. If `data` is a `sf` polygon object, the queen
 #' adjacency matrix is used when no `wt` object is provided. In other cases, you must
 #' provide a `wt` object.
@@ -62,7 +62,6 @@ srsgd = \(formula,data,wt = NULL,type = "factor",alpha = 0.95){
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print srsgd_result
 #' @export
 print.srsgd_result = \(x, ...) {
   nx = names(x)
@@ -84,7 +83,6 @@ print.srsgd_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `patchwork::wrap_plots()`.
 #'
 #' @return A ggplot2 layer
-#' @method plot srsgd_result
 #' @export
 #'
 plot.srsgd_result = \(x, ...) {

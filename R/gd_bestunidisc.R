@@ -4,8 +4,8 @@
 #' Function for determining the best univariate discretization based on geodetector q-statistic.
 #'
 #' @param formula A formula of best univariate discretization.
-#' @param data A data.frame or tibble of observation data.
-#' @param discnum (optional) A vector of number of classes for discretization. Default is `3:22`.
+#' @param data A `data.frame` or `tibble` of observation data.
+#' @param discnum (optional) A vector of number of classes for discretization. Default is `3:8`.
 #' @param discmethod (optional) A vector of methods for discretization, default is using
 #' `c("sd","equal","geometric","quantile","natural")` by invoking `sdsfun`.
 #' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
@@ -15,8 +15,7 @@
 #' @param seed (optional) Random seed number, default is `123456789`.
 #' @param ... (optional) Other arguments passed to `sdsfun::discretize_vector()`.
 #'
-#' @return A list with the optimal parameter in the provided parameter combination with `k`,
-#' `method` and `disc`(when `return_disc` is `TRUE`).
+#' @return A list.
 #' \describe{
 #' \item{\code{x}}{the name of the variable that needs to be discretized}
 #' \item{\code{k}}{optimal discretization number}
@@ -31,7 +30,7 @@
 #'                data = sim,
 #'                discnum = 3:6)
 #'
-gd_bestunidisc = \(formula, data, discnum = 3:22,
+gd_bestunidisc = \(formula, data, discnum = 3:8,
                    discmethod = c("sd","equal","geometric","quantile","natural"),
                    cores = 1, return_disc = TRUE, seed = 123456789, ...){
   doclust = FALSE
@@ -86,7 +85,7 @@ gd_bestunidisc = \(formula, data, discnum = 3:22,
 
   if(return_disc){
     suppressMessages({resdisc = purrr::pmap_dfc(out_g,
-                              \(x,k,method) sdsfun::discretize_vector(
+                                \(x,k,method) sdsfun::discretize_vector(
                                 x = explanatory[,x,drop = TRUE],
                                 n = k, method = method, ...)) %>%
       purrr::set_names(out_g[[1]])})

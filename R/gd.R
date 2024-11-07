@@ -31,6 +31,7 @@
 #'
 gd = \(formula, data, type = "factor", alpha = 0.95){
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
+  data = tibble::as_tibble(data)
   if (length(type) == 1){
     res = geodetector(formula,data = data,type = type,alpha = alpha)
   } else {
@@ -55,7 +56,6 @@ gd = \(formula, data, type = "factor", alpha = 0.95){
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print gd_result
 #' @export
 print.gd_result = \(x, ...) {
   nx = names(x)
@@ -76,7 +76,6 @@ print.gd_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `patchwork::wrap_plots()`.
 #'
 #' @return A ggplot2 layer
-#' @method plot gd_result
 #' @export
 #'
 plot.gd_result = \(x, ...) {

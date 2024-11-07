@@ -4,19 +4,19 @@
 \alias{rgd}
 \title{robust geographical detector(RGD) model}
 \usage{
-rgd(formula, data, discvar = NULL, discnum = 3:22, minsize = 1, cores = 1)
+rgd(formula, data, discvar = NULL, discnum = 3:8, minsize = 1, cores = 1)
 }
 \arguments{
 \item{formula}{A formula of RGD model.}
 
-\item{data}{A data.frame, tibble or sf object of observation data.}
+\item{data}{A \code{data.frame}, \code{tibble} or \code{sf} object of observation data.}
 
 \item{discvar}{Name of continuous variable columns that need to be discretized. Noted that
 when \code{formula} has \code{discvar}, \code{data} must have these columns. By default, all independent
 variables are used as \code{discvar}.}
 
 \item{discnum}{A numeric vector of discretized classes of columns that need to be discretized.
-Default all \code{discvar} use \code{3:22}.}
+Default all \code{discvar} use \code{3:8}.}
 
 \item{minsize}{(optional) The min size of each discretization group. Default all use \code{1}.}
 
@@ -40,10 +40,11 @@ See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 \examples{
 \dontrun{
 ## The following code needs to configure the Python environment to run:
-data('ndvi')
-g = rgd(NDVIchange ~ ., data = ndvi,
-        discvar = names(ndvi)[-1:-3],
-        discnum = 3:8, cores = 6)
+data('sim')
+g = rgd(y ~ .,
+        data = dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
+        discnum = 3:6, cores = 6)
+g
 }
 }
 \references{

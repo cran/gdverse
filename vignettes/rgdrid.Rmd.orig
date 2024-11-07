@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ### Set up python dependence
 
 1. Install **miniconda**
-2. Open the conda terminal and perform steps 3 to 6
+2. Open the conda terminal and perform steps `3` to `6`
 3. Create a new conda env `gdverse`
 
    > `conda create -n gdverse python=3.10 -y`
@@ -58,14 +58,11 @@ names(ndvi)
 
 ### Run RGD
 
-```{r}
-ndvi_rgd = rgd(NDVIchange ~ ., data = ndvi,
-               discvar = names(select(ndvi,-c(NDVIchange,Climatezone,Mining))),
-               discnum = 3:10, cores = 12)
-ndvi_rgd
-```
-
 ```{r rgd_id,fig.width=10.25,fig.height=4.25}
+ndvi_rgd = rgd(NDVIchange ~ ., data = ndvi,
+               discvar = names(dplyr::select(ndvi,-c(NDVIchange,Climatezone,Mining))),
+               discnum = 3:8, cores = 12)
+ndvi_rgd
 plot(ndvi_rgd)
 ```
 
@@ -73,9 +70,10 @@ plot(ndvi_rgd)
 
 `RID` allows you to obtain the interactions of all possible combinations of variables. By default, `Spatial Intersection` are used to generate a new spatial partition of the interaction variables.
 
-```{r}
+```{r rid_plot,fig.width=6.35,fig.height=4.05}
 ndvi_rid = rid(NDVIchange ~ ., data = ndvi,
-               discvar = names(select(ndvi,-c(NDVIchange,Climatezone,Mining))),
-               discnum = 10, cores = 12)
+               discvar = names(dplyr::select(ndvi,-c(NDVIchange,Climatezone,Mining))),
+               discnum = 8, cores = 12)
 ndvi_rid
+plot(ndvi_rid)
 ```

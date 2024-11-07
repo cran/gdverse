@@ -15,9 +15,9 @@
 #' to ensure the trade-off between analysis results and calculation speed.
 #'
 #' @param formula A formula of IDSA model.
-#' @param data A data.frame, tibble or sf object of observation data.
+#' @param data A `data.frame`, `tibble` or `sf` object of observation data.
 #' @param wt (optional) The spatial weight matrix. When `data` is not an `sf` object, must provide `wt`.
-#' @param discnum (optional) Number of multilevel discretization. Default will use `3:22`.
+#' @param discnum (optional) Number of multilevel discretization. Default will use `3:8`.
 #' @param discmethod (optional) The discretization methods. Default all use `quantile`.
 #' Noted that `robust` will use `robust_disc()`; `rpart` will use `rpart_disc()`;
 #' Others use `sdsfun::discretize_vector()`.
@@ -37,8 +37,7 @@
 #' @return A list.
 #' \describe{
 #' \item{\code{interaction}}{the interaction result of IDSA model}
-#' \item{\code{risk1}}{whether values of the response variable between a pair of overlay zones are significantly different}
-#' \item{\code{risk2}}{risk detection result of the input data}
+#' \item{\code{risk}}{whether values of the response variable between a pair of overlay zones are significantly different}
 #' \item{\code{number_individual_explanatory_variables}}{the number of individual explanatory variables used for examining the interaction effects}
 #' \item{\code{number_overlay_zones}}{the number of overlay zones}
 #' \item{\code{percentage_finely_divided_zones}}{the percentage of finely divided zones that are determined by the interaction of variables}
@@ -51,7 +50,7 @@
 #' g = idsa(y ~ ., data = sim1)
 #' g
 #'
-idsa = \(formula,data,wt = NULL,discnum = 3:22,discmethod = "quantile",
+idsa = \(formula,data,wt = NULL,discnum = 3:8,discmethod = "quantile",
          overlay = 'and', strategy = 2L, increase_rate = 0.05,
          cores = 1, seed = 123456789, alpha = 0.95, ...){
   formula = stats::as.formula(formula)
@@ -70,6 +69,7 @@ idsa = \(formula,data,wt = NULL,discnum = 3:22,discmethod = "quantile",
       wt_idsa = wt
     }
   }
+  data = tibble::as_tibble(data)
   if (formula.vars[2] != "."){
     data = dplyr::select(data,dplyr::all_of(formula.vars))
   }
@@ -135,19 +135,11 @@ idsa = \(formula,data,wt = NULL,discnum = 3:22,discmethod = "quantile",
   zonenum = as.numeric(table(reszone))
   percentzone = length(which(zonenum==1)) / length(reszone)
   risk1 = risk_detector(dti[,yname,drop = TRUE],reszone,alpha)
-  risk2 = risk1 %>%
-    dplyr::select(dplyr::all_of(c('zone1st','zone2nd','Risk'))) %>%
-    tidyr::pivot_longer(cols = dplyr::all_of(c('zone1st','zone2nd')),
-                        names_to = 'zone', values_to = 'zone_risk') %>%
-    dplyr::distinct(zone_risk,.keep_all = TRUE)
-  risk2 = tibble::tibble(reszone = paste0('zone',reszone)) %>%
-    dplyr::left_join(risk2, by = c('reszone' = 'zone_risk')) %>%
-    dplyr::pull(Risk)
   out_g = tibble::tibble(variable = xsname) %>%
     dplyr::bind_cols(out_g) %>%
     dplyr::arrange(dplyr::desc(pid_idsa))
 
-  res = list("interaction" = out_g, "risk1" = risk1, "risk2" = risk2,
+  res = list("interaction" = out_g, "risk" = risk1,
              "number_individual_explanatory_variables" = length(interactvar),
              "number_overlay_zones" = length(zonenum),
              "percentage_finely_divided_zones" =  percentzone)
@@ -164,7 +156,6 @@ idsa = \(formula,data,wt = NULL,discnum = 3:22,discmethod = "quantile",
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print idsa_result
 #' @export
 #'
 print.idsa_result = \(x, ...) {
@@ -176,7 +167,7 @@ print.idsa_result = \(x, ...) {
       "* Percentage of finely divided zones : ",x$percentage_finely_divided_zones,"\n",
       "* Number of individual explanatory variables : ",x$number_individual_explanatory_variables,"\n",
       "\n ## Different of response variable between a pair of overlay zones:")
-  x = dplyr::select(x$risk1,zone1st,zone2nd,Risk)
+  x = dplyr::select(x$risk,zone1st,zone2nd,Risk)
   print(knitr::kable(utils::head(x,5), format = "markdown", align = 'c', ...))
   cat("\n #### Only the first five pairs of interactions and overlay zones are displayed! ####")
 }
@@ -190,11 +181,10 @@ print.idsa_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `ggplot2::theme()`.
 #'
 #' @return A ggplot2 layer
-#' @method plot idsa_result
 #' @export
 #'
 plot.idsa_result = \(x, ...) {
-  grd = dplyr::select(x$risk1,zone1st,zone2nd,Risk) %>%
+  grd = dplyr::select(x$risk,zone1st,zone2nd,Risk) %>%
     dplyr::mutate(risk = forcats::fct_recode(Risk,"Y" = "Yes", "N" = "No"))
   fig_rd = ggplot2::ggplot(data = grd,
                            ggplot2::aes(x = zone1st, y = zone2nd, fill = risk)) +

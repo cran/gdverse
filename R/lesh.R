@@ -15,7 +15,7 @@
 #' https://doi.org/10.1080/17538947.2023.2271883
 #'
 #' @param formula A formula of LESH model.
-#' @param data A data.frame, tibble or sf object of observation data.
+#' @param data A `data.frame`, `tibble` or `sf` object of observation data.
 #' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
 #' multi-core parallel computing.
 #' @param ... (optional) Other arguments passed to `rpart_disc()`.
@@ -34,6 +34,7 @@
 #'
 lesh = \(formula,data,cores = 1,...){
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
+  data = tibble::as_tibble(data)
   spd = spd_lesh(formula,data,cores,...)
   pd = gozh(formula,data,cores,type = 'interaction',...)[[1]]
   res = pd %>%
@@ -41,7 +42,7 @@ lesh = \(formula,data,cores = 1,...){
                      by = c("variable1" = "variable")) %>%
     dplyr::left_join(dplyr::select(spd,variable,spd2 = spd_theta),
                      by = c("variable2" = "variable")) %>%
-    dplyr::mutate(spd = (spd1 + spd2), spd1 = spd1 / spd, spd2 = spd2 / spd,
+    dplyr::mutate(spd = (abs(spd1) + abs(spd2)), spd1 = abs(spd1) / spd, spd2 = abs(spd2) / spd,
                   `Variable1 SPD` = `Variable1 and Variable2 interact Q-statistics`*spd1,
                   `Variable2 SPD` = `Variable1 and Variable2 interact Q-statistics`*spd2) %>%
     dplyr::select(-dplyr::starts_with('spd'))
@@ -59,7 +60,6 @@ lesh = \(formula,data,cores = 1,...){
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print lesh_result
 #' @export
 #'
 print.lesh_result = \(x, ...) {
@@ -93,7 +93,6 @@ print.lesh_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `ggplot2::theme()`.
 #'
 #' @return A ggplot2 layer.
-#' @method plot lesh_result
 #' @export
 #'
 plot.lesh_result = \(x, pie = TRUE,

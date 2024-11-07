@@ -10,7 +10,7 @@
 #' https://doi.org/10.1016/j.isprsjprs.2022.01.009
 #'
 #' @param formula A formula of GOZH model.
-#' @param data A data.frame, tibble or sf object of observation data.
+#' @param data A `data.frame`, `tibble` or `sf` object of observation data.
 #' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
 #' multi-core parallel computing.
 #' @param type (optional) The type of geographical detector,which must be `factor`(default),
@@ -35,6 +35,7 @@
 gozh = \(formula, data, cores = 1,
          type = "factor",alpha = 0.95,...){
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
+  data = tibble::as_tibble(data)
   if (length(type) == 1){
     res = gozh_detector(formula, data, cores, type, alpha, ...)
   } else {
@@ -57,7 +58,6 @@ gozh = \(formula, data, cores = 1,
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print gozh_result
 #' @export
 #'
 print.gozh_result = \(x, ...) {
@@ -80,7 +80,6 @@ print.gozh_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `patchwork::wrap_plots()`.
 #'
 #' @return A ggplot2 layer
-#' @method plot gozh_result
 #' @export
 #'
 plot.gozh_result = \(x, ...) {

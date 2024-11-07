@@ -10,12 +10,12 @@
 #' See `vignette('rgdrid',package = 'gdverse')` for more details.
 #'
 #' @param formula A formula of RGD model.
-#' @param data A data.frame, tibble or sf object of observation data.
+#' @param data A `data.frame`, `tibble` or `sf` object of observation data.
 #' @param discvar Name of continuous variable columns that need to be discretized. Noted that
 #' when `formula` has `discvar`, `data` must have these columns. By default, all independent
 #' variables are used as `discvar`.
 #' @param discnum A numeric vector of discretized classes of columns that need to be discretized.
-#' Default all `discvar` use `3:22`.
+#' Default all `discvar` use `3:8`.
 #' @param minsize (optional) The min size of each discretization group. Default all use `1`.
 #' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
 #' multi-core parallel computing.
@@ -30,15 +30,17 @@
 #' @examples
 #' \dontrun{
 #' ## The following code needs to configure the Python environment to run:
-#' data('ndvi')
-#' g = rgd(NDVIchange ~ ., data = ndvi,
-#'         discvar = names(ndvi)[-1:-3],
-#'         discnum = 3:8, cores = 6)
+#' data('sim')
+#' g = rgd(y ~ .,
+#'         data = dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
+#'         discnum = 3:6, cores = 6)
+#' g
 #' }
-rgd = \(formula, data, discvar = NULL, discnum = 3:22, minsize = 1, cores = 1){
+rgd = \(formula, data, discvar = NULL, discnum = 3:8, minsize = 1, cores = 1){
   formula = stats::as.formula(formula)
   formula.vars = all.vars(formula)
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
+  data = tibble::as_tibble(data)
   if (formula.vars[2] != "."){
     data = dplyr::select(data,dplyr::all_of(formula.vars))
   }
@@ -61,8 +63,7 @@ rgd = \(formula, data, discvar = NULL, discnum = 3:22, minsize = 1, cores = 1){
     resqv[[i]] = gd(paste0(yname,' ~ .'),data = newdata,type = "factor")[[1]]
   }
   qv = purrr::map2_dfr(resqv, discnum,
-                       \(.x,.n) .x %>%
-                         dplyr::mutate(discnum = .n))
+                       \(.x,.n) dplyr::mutate(.x,discnum = .n))
   disc = purrr::map2_dfr(resdisc, discnum,
                          \(.x,.n) dplyr::mutate(.x,discnum = .n))
   res = list("factor" = qv, "disc" = disc)
@@ -79,10 +80,9 @@ rgd = \(formula, data, discvar = NULL, discnum = 3:22, minsize = 1, cores = 1){
 #' @param ... (optional) Other arguments passed to `knitr::kable()`.
 #'
 #' @return Formatted string output
-#' @method print rgd_result
 #' @export
 print.rgd_result = \(x, ...) {
-  cat("***          Robust Geographical Detector       ")
+  cat("***      Robust Geographical Detector    ")
   qv = x[[1]]
   qv = qv %>%
     dplyr::filter(discnum == max(qv$discnum)) %>%
@@ -105,7 +105,6 @@ print.rgd_result = \(x, ...) {
 #' @param ... (optional) Other arguments passed to `ggplot2::theme()`.
 #'
 #' @return A ggplot2 layer
-#' @method plot rgd_result
 #' @export
 #'
 plot.rgd_result = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {

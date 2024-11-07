@@ -4,20 +4,12 @@
 \alias{rid}
 \title{robust interaction detector(RID) model}
 \usage{
-rid(
-  formula,
-  data,
-  discvar = NULL,
-  discnum = 10,
-  overlay = "intersection",
-  minsize = 1,
-  cores = 1
-)
+rid(formula, data, discvar = NULL, discnum = 10, minsize = 1, cores = 1)
 }
 \arguments{
 \item{formula}{A formula of RID model.}
 
-\item{data}{A data.frame, tibble or sf object of observation data.}
+\item{data}{A \code{data.frame}, \code{tibble} or \code{sf} object of observation data.}
 
 \item{discvar}{Name of continuous variable columns that need to be discretized. Noted that
 when \code{formula} has \code{discvar}, \code{data} must have these columns. By default, all independent
@@ -25,9 +17,6 @@ variables are used as \code{discvar}.}
 
 \item{discnum}{A numeric vector for the number of discretized classes of columns that need
 to be discretized. Default all \code{discvar} use \code{10}.}
-
-\item{overlay}{(optional) Spatial overlay method. One of \code{and}, \code{or}, \code{intersection}.
-Default is \code{intersection}.}
 
 \item{minsize}{(optional) The min size of each discretization group. Default all use \code{1}.}
 
@@ -44,11 +33,6 @@ A list.
 Function for robust interaction detector(RID) model.
 }
 \note{
-The RID model requires at least \eqn{2^n-1} calculations when has \eqn{n} explanatory variables.
-When there are more than 10 explanatory variables, carefully consider the computational burden of this model.
-When there are a large number of explanatory variables, the data dimensionality reduction method can be used
-to ensure the trade-off between analysis results and calculation speed.
-
 Please set up python dependence and configure \code{GDVERSE_PYTHON} environment variable if you want to run \code{rid()}.
 See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 }
@@ -57,7 +41,7 @@ See \code{vignette('rgdrid',package = 'gdverse')} for more details.
 ## The following code needs to configure the Python environment to run:
 data('sim')
 g = rid(y ~ .,
-        data =  dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
+        data = dplyr::select(sim,-dplyr::any_of(c('lo','la'))),
         discnum = 4, cores = 6)
 g
 }
