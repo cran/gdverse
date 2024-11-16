@@ -8,7 +8,7 @@ psmd_pseudop(
   yobs,
   xobs,
   wt,
-  discnum = 3:22,
+  discnum = 3:8,
   discmethod = "quantile",
   cores = 1,
   seed = 123456789,
@@ -23,7 +23,7 @@ psmd_pseudop(
 
 \item{wt}{The spatial weight matrix.}
 
-\item{discnum}{(optional) Number of multilevel discretization. Default will use \code{3:22}.}
+\item{discnum}{(optional) Number of multilevel discretization. Default will use \code{3:8}.}
 
 \item{discmethod}{(optional) The discretization methods. Default will use \code{quantile}.
 If \code{discmethod} is set to \code{robust}, the function \code{robust_disc()} will be used. Conversely,
@@ -51,7 +51,7 @@ The power of spatial and multilevel discretization determinant formula is
 }
 \examples{
 data('sim')
-wt = inverse_distance_weight(sim$lo,sim$la)
+wt = sdsfun::inverse_distance_swm(sf::st_as_sf(sim,coords = c('lo','la')))
 psmd_pseudop(sim$y,sim$xa,wt)
 
 }

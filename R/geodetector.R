@@ -18,6 +18,7 @@
 #' factor_detector(y = 1:7,x = c('x',rep('y',3),rep('z',3)))
 #'
 factor_detector = \(y,x){
+  x = gdverse::all2int(x)
   gdf = tibble::tibble(x = x, y = y) %>%
     dplyr::group_by(x) %>%
     dplyr::filter(dplyr::n() > 1) %>%
@@ -68,9 +69,9 @@ factor_detector = \(y,x){
 #'
 interaction_detector = \(y,x1,x2){
   x12 = paste0(x1,x2,'_')
-  qv1 = factor_detector(y,x1)[[1]]
-  qv2 = factor_detector(y,x2)[[1]]
-  qv12 = factor_detector(y,x12)[[1]]
+  qv1 = gdverse::factor_detector(y,x1)[[1]]
+  qv2 = gdverse::factor_detector(y,x2)[[1]]
+  qv12 = gdverse::factor_detector(y,x12)[[1]]
 
   if (qv12 < min(qv1, qv2)) {
     interaction = c("Weaken, nonlinear")
@@ -225,19 +226,16 @@ geodetector = \(formula,data,type = "factor",alpha = 0.95){
     stop("`type` must be one of `factor`,`interaction`,`risk` and `ecological`!")
   }
 
-  formula = stats::as.formula(formula)
-  formula.vars = all.vars(formula)
-  response = data[, formula.vars[1], drop = TRUE]
-  if (formula.vars[2] == "."){
-    explanatory = data[,-which(colnames(data) == formula.vars[1])]
-  } else {
-    explanatory = subset(data, TRUE, match(formula.vars[-1], colnames(data)))
-  }
+  if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
+  data = tibble::as_tibble(data)
+  formulaname = sdsfun::formula_varname(formula,data)
+  response = data[, formulaname[[1]], drop = TRUE]
+  explanatory = data[, formulaname[[2]]]
 
   switch(type,
          "factor" = {
            res = purrr::map_dfr(names(explanatory),
-                                \(i) factor_detector(response,
+                                \(i) gdverse::factor_detector(response,
                                                      data[,i,drop = TRUE])) %>%
              dplyr::mutate(variable = names(explanatory)) %>%
              dplyr::select(variable,dplyr::everything()) %>%
@@ -247,7 +245,7 @@ geodetector = \(formula,data,type = "factor",alpha = 0.95){
          },
          "interaction" = {
            res = utils::combn(names(explanatory), 2, simplify = FALSE) %>%
-             purrr::map_dfr(\(i) interaction_detector(response,
+             purrr::map_dfr(\(i) gdverse::interaction_detector(response,
                                                       data[,i[1],drop = TRUE],
                                                       data[,i[2],drop = TRUE]) %>%
                               tibble::as_tibble() %>%
@@ -260,7 +258,7 @@ geodetector = \(formula,data,type = "factor",alpha = 0.95){
          },
          "risk" = {
            res = purrr::map_dfr(names(explanatory),
-                                \(i) risk_detector(response,
+                                \(i) gdverse::risk_detector(response,
                                                    data[,i,drop = TRUE],
                                                    alpha) %>%
                                   dplyr::mutate(variable = i) %>%
@@ -271,7 +269,7 @@ geodetector = \(formula,data,type = "factor",alpha = 0.95){
          },
          "ecological" = {
            res = utils::combn(names(explanatory), 2, simplify = FALSE) %>%
-             purrr::map_dfr(\(i) ecological_detector(response,
+             purrr::map_dfr(\(i) gdverse::ecological_detector(response,
                                                      data[,i[1],drop = TRUE],
                                                      data[,i[2],drop = TRUE],
                                                      alpha) %>%
@@ -299,7 +297,7 @@ geodetector = \(formula,data,type = "factor",alpha = 0.95){
 #' @export
 #'
 print.factor_detector = \(x, ...) {
-  cat("***          Factor Detector            ")
+  cat("                Factor Detector            ")
   # pander::pander(x$factor)
   print(knitr::kable(x$factor,format = "markdown",digits = 12,align = 'c',...))
 }
@@ -316,7 +314,7 @@ print.factor_detector = \(x, ...) {
 #' @export
 #'
 print.interaction_detector = \(x, ...) {
-  cat("***        Interaction Detector         ")
+  cat("                Interaction Detector         ")
   IntersectionSymbol = rawToChar(as.raw(c(0x20, 0xE2, 0x88, 0xA9, 0x20)))
   x = x$interaction %>%
     dplyr::mutate(`Interactive variable` = paste0(variable1,
@@ -339,7 +337,7 @@ print.interaction_detector = \(x, ...) {
 #' @export
 #'
 print.risk_detector = \(x, ...) {
-  cat("***            Risk Detector            \n")
+  cat("                Risk Detector            \n")
   x = dplyr::select(x$risk,variable,zone1st,zone2nd,Risk)
   xvar = x %>%
     dplyr::count(variable) %>%
@@ -373,7 +371,7 @@ print.risk_detector = \(x, ...) {
 #' @export
 #'
 print.ecological_detector = \(x, ...) {
-  cat("***          Ecological Detector         ")
+  cat("                Ecological Detector         ")
   x = dplyr::select(x$ecological,
                     dplyr::all_of(c('variable1','variable2','Ecological')))
   ed2mat = \(x){
@@ -430,14 +428,16 @@ plot.factor_detector = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {
     ggplot2::scale_fill_manual(breaks = c("first", "others"),
                                values = c("#DE3533","#808080")) +
     ggplot2::geom_text(data = dplyr::slice(g, seq(1,slicenum)),
-                       ggplot2::aes(label = qv_text),
-                       hjust = 1.25, color = "black", fontface = "bold") +
+                       ggplot2::aes(label = qv_text), hjust = 1.25,
+                       family = "serif", fontface = "bold") +
     ggplot2::geom_text(data = dplyr::slice(g, -seq(1,slicenum)),
-                       ggplot2::aes(label = qv_text),
-                       hjust = -0.1, color = "black", fontface = "bold") +
+                       ggplot2::aes(label = qv_text), hjust = -0.1,
+                       family = "serif", fontface = "bold") +
     ggplot2::labs(x = "Q value", y = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_text(family = "serif"),
+                   axis.text.x = ggplot2::element_text(family = "serif"),
                    legend.position = "off", ...)
   return(fig_factor)
 }
@@ -483,7 +483,9 @@ plot.interaction_detector = \(x,alpha = 1,...){
     ggplot2::labs(x = "", y = "", size = "", color = "") +
     ggplot2::coord_fixed() +
     ggplot2::theme_bw() +
-    ggplot2::theme(...)
+    ggplot2::theme(axis.text.y = ggplot2::element_text(family = "serif"),
+                   axis.text.x = ggplot2::element_text(family = "serif"),
+                   ...)
   return(fig_interaction)
 }
 
@@ -509,12 +511,13 @@ plot.risk_detector = \(x, ...) {
       ggplot2::theme_minimal() +
       ggplot2::theme(axis.title.x = ggplot2::element_blank(),
                      axis.title.y = ggplot2::element_blank(),
-                     axis.text.x = ggplot2::element_text(angle = 60,hjust = 1,color = 'black'),
-                     axis.text.y = ggplot2::element_text(color = 'black'),
+                     axis.text.x = ggplot2::element_text(angle = 60,hjust = 1,family = "serif"),
+                     axis.text.y = ggplot2::element_text(family = "serif"),
                      legend.position = "none",
                      panel.grid = ggplot2::element_blank(), ...) +
       ggplot2::annotate("text", x = Inf, y = -Inf, label = gname,
-                        vjust = -1.75, hjust = 1.25, color = "#ff0000")
+                        vjust = -1.75, hjust = 1.25,
+                        color = "#ff0000", family = "serif")
     return(fig_rd)
   }
   g = dplyr::select(x$risk,variable,zone1st,zone2nd,Risk) %>%
@@ -563,7 +566,8 @@ plot.ecological_detector = \(x, ...) {
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.title.x = ggplot2::element_blank(),
                    axis.title.y = ggplot2::element_blank(),
-                   axis.text = ggplot2::element_text(color = 'black'),
+                   axis.text.y = ggplot2::element_text(family = "serif"),
+                   axis.text.x = ggplot2::element_text(family = "serif"),
                    legend.position = "none",
                    panel.grid = ggplot2::element_blank(), ...)
   return(fig_ed)

@@ -44,16 +44,12 @@ spade = \(formula, data, wt = NULL, discvar = NULL, discnum = 3:8,
   formula.vars = all.vars(formula)
   if (inherits(data,'sf')) {
     if (is.null(wt)){
-      wt_spade = sdsfun::inverse_distance_swm(data)
-    } else {
-      wt_spade = wt
+      wt = sdsfun::inverse_distance_swm(data)
     }
     data = sf::st_drop_geometry(data)
   } else if (inherits(data,'data.frame')) {
     if (is.null(wt)){
       stop("When `data` is `data.frame` or `tibble`, please provide `wt`!")
-    } else {
-      wt_spade = wt
     }
   }
   data = tibble::as_tibble(data)
@@ -72,17 +68,17 @@ spade = \(formula, data, wt = NULL, discvar = NULL, discnum = 3:8,
   if (length(discmethod) == 1) {discmethod = rep('quantile',length(xdiscname))}
   qv_disc = vector("list",length = length(xdiscname))
   for (i in seq_along(xdiscname)){
-    qv_disc[[i]] = psmd_pseudop(data[,yname,drop=TRUE],
-                                data[,xdiscname[i],drop=TRUE],
-                                wt_spade, discnum, discmethod[i],
-                                cores, seed, permutations, ...)
+    qv_disc[[i]] = gdverse::psmd_pseudop(data[,yname,drop=TRUE],
+                                         data[,xdiscname[i],drop=TRUE],
+                                         wt, discnum, discmethod[i],
+                                         cores, seed, permutations, ...)
   }
   if (!is.null(xundiscname)) {
     qv_undisc = vector("list",length = length(xundiscname))
     for (i in seq_along(xundiscname)){
-      qv_undisc[[i]] = psd_pseudop(data[,yname,drop=TRUE],
-                                   data[,xundiscname[i],drop=TRUE],
-                                   wt_spade, cores, seed, permutations)
+      qv_undisc[[i]] = gdverse::psd_pseudop(data[,yname,drop=TRUE],
+                                            data[,xundiscname[i],drop=TRUE],
+                                            wt, cores, seed, permutations)
     }
     qv = purrr::list_cbind(c(qv_disc,qv_undisc))
     xname = c(xdiscname,xundiscname)
@@ -148,13 +144,15 @@ plot.spade_result = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {
                                  values = c("#DE3533","#808080")) +
       ggplot2::geom_text(data = dplyr::slice(g, seq(1,slicenum)),
                          ggplot2::aes(label = qv_text),
-                         hjust = 1.25, color = "black", fontface = "bold") +
+                         hjust = 1.25, family = "serif", fontface = "bold") +
       ggplot2::geom_text(data = dplyr::slice(g, -seq(1,slicenum)),
                          ggplot2::aes(label = qv_text),
-                         hjust = -0.1, color = "black", fontface = "bold") +
+                         hjust = -0.1, family = "serif", fontface = "bold") +
       ggplot2::labs(x = "Q value", y = "") +
       ggplot2::theme_bw() +
       ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                     axis.text.y = ggplot2::element_text(family = "serif"),
+                     axis.text.x = ggplot2::element_text(family = "serif"),
                      legend.position = "off", ...)
   } else {
     class(x) = "factor_detector"

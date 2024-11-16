@@ -8,7 +8,7 @@ cpsd_disc(
   formula,
   data,
   wt,
-  discnum = 3:22,
+  discnum = 3:8,
   discmethod = "quantile",
   strategy = 2L,
   increase_rate = 0.05,
@@ -25,7 +25,7 @@ cpsd_disc(
 
 \item{wt}{The spatial weight matrix.}
 
-\item{discnum}{(optional) A vector of number of classes for discretization. Default is \code{3:22}.}
+\item{discnum}{(optional) A vector of number of classes for discretization. Default is \code{3:8}.}
 
 \item{discmethod}{(optional) The discretization methods. Default all use \code{quantile}.
 Noted that \code{robust} will use \code{robust_disc()}; \code{rpart} will use \code{rpart_disc()};
@@ -70,7 +70,7 @@ Consequently, the use of robust discretization is not advised.
 }
 \examples{
 data('sim')
-wt = inverse_distance_weight(sim$lo,sim$la)
+wt = sdsfun::inverse_distance_swm(sf::st_as_sf(sim,coords = c('lo','la')))
 cpsd_disc(y ~ xa + xb + xc,
           data = sim,
           wt = wt)

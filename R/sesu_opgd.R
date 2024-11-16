@@ -60,7 +60,7 @@ sesu_opgd = \(formula,datalist,su,discvar,discnum = 3:8,
               discmethod = c("sd","equal","geometric","quantile","natural"),
               cores = 1, increase_rate = 0.05, alpha = 0.95, ...){
   res_sesu = purrr::map2(datalist, su,
-                         \(.tbf, .spsu) opgd(formula, .tbf, discvar, discnum,
+                         \(.tbf, .spsu) gdverse::opgd(formula, .tbf, discvar, discnum,
                                              discmethod, cores, type = "factor",
                                              alpha = alpha, ...) %>%
                                 purrr::pluck('factor') %>%
@@ -72,7 +72,7 @@ sesu_opgd = \(formula,datalist,su,discvar,discnum = 3:8,
     dplyr::filter(`P-value` <= (1 - alpha) | is.na(`P-value`)) %>%
     dplyr::group_by(su) %>%
     dplyr::summarise(qv = mean(`Q-statistic`,na.rm = T))
-  optsu = loess_optscale(optsu$qv,optsu$su,increase_rate)
+  optsu = gdverse::loess_optscale(optsu$qv,optsu$su,increase_rate)
   res = list('sesu' = sesu,'optsu' = optsu[1],
              'increase_rate' = optsu[2])
   class(res) = 'sesu_opgd'
@@ -157,7 +157,10 @@ plot.sesu_opgd = \(x,...){
       ggplot2::scale_shape_manual(name = "", values = shapev) +
       ggplot2::scale_color_manual(name = "", values = colv) +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid = ggplot2::element_blank(), ...)
+      ggplot2::theme(panel.grid = ggplot2::element_blank(),
+                     axis.text.y = ggplot2::element_text(family = "serif"),
+                     axis.text.x = ggplot2::element_text(family = "serif"),
+                     ...)
   } else {
     fig_g = ggplot2::ggplot(g, ggplot2::aes(x = su, y = qv)) +
       ggplot2::geom_point(ggplot2::aes(color = variable),
@@ -178,7 +181,10 @@ plot.sesu_opgd = \(x,...){
                                     labels = qv95, breaks = qv95,
                                     transform = ~ .)) +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid = ggplot2::element_blank(), ...)
+      ggplot2::theme(panel.grid = ggplot2::element_blank(),
+                     axis.text.y = ggplot2::element_text(family = "serif"),
+                     axis.text.x = ggplot2::element_text(family = "serif"),
+                     ...)
   }
  return(fig_g)
 }

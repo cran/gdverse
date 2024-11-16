@@ -1,7 +1,7 @@
-#' @title locally explained heterogeneity(LESH) model
+#' @title locally explained stratified heterogeneity(LESH) model
 #' @author Wenbo Lv \email{lyu.geosocial@gmail.com}
 #' @description
-#' Function for locally explained heterogeneity model.
+#' Function for locally explained stratified heterogeneity model.
 #'
 #' @note
 #' The LESH model requires at least \eqn{2^n-1} calculations when has \eqn{n} explanatory variables.
@@ -23,7 +23,7 @@
 #' @return A list.
 #' \describe{
 #' \item{\code{interaction}}{the interaction result of LESH model}
-#' \item{\code{spd_lesh}}{a tibble of the SHAP power of determinants}
+#' \item{\code{spd_lesh}}{a tibble of the shap power of determinants}
 #' }
 #' @export
 #'
@@ -35,8 +35,8 @@
 lesh = \(formula,data,cores = 1,...){
   if (inherits(data,'sf')) {data = sf::st_drop_geometry(data)}
   data = tibble::as_tibble(data)
-  spd = spd_lesh(formula,data,cores,...)
-  pd = gozh(formula,data,cores,type = 'interaction',...)[[1]]
+  spd = gdverse::spd_lesh(formula,data,cores,...)
+  pd = gdverse::gozh(formula,data,cores,type = 'interaction',...)[[1]]
   res = pd %>%
     dplyr::left_join(dplyr::select(spd,variable,spd1 = spd_theta),
                      by = c("variable1" = "variable")) %>%
@@ -63,14 +63,13 @@ lesh = \(formula,data,cores = 1,...){
 #' @export
 #'
 print.lesh_result = \(x, ...) {
-  cat("***    Spatial Interaction Association Detector      \n",
-      "                    LESH Model                     ")
+  cat("***       Locally Explained Stratified Heterogeneity Model         ")
   IntersectionSymbol = rawToChar(as.raw(c(0x20, 0xE2, 0x88, 0xA9, 0x20)))
   x = x$interaction %>%
     dplyr::mutate(`Interactive variable` = paste0(variable1,
                                                   IntersectionSymbol,
                                                   variable2)) %>%
-    dplyr::select(`Interactive variable`,Interaction)
+    dplyr::select(`Interactive variable`,Interaction,`Variable1 SPD`,`Variable2 SPD`)
   print(knitr::kable(x,format = "markdown",digits = 12,align = 'c',...))
 }
 
@@ -148,8 +147,8 @@ plot.lesh_result = \(x, pie = TRUE,
                                   labels = g_pie$variable2) +
       ggplot2::coord_equal() +
       ggplot2::theme_bw() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(color = '#75c7af'),
-                     axis.text.y = ggplot2::element_text(color = '#fb9872'),
+      ggplot2::theme(axis.text.x = ggplot2::element_text(family = "serif", color = '#75c7af'),
+                     axis.text.y = ggplot2::element_text(family = "serif", color = '#fb9872'),
                      ...)
     #--- use PieGlyph package ---
   #   fig_pie = ggplot2::ggplot(data = g_pie,

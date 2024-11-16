@@ -1,3 +1,17 @@
+# gdverse 1.3
+
+* Redundant functions consolidated and migrated to `sdsfun` for maintenance (#22).
+
+* Reorganize the parallel computing section in gdverse (#21).
+
+* Align the RGD model with the original algorithm presented in paper (#20).
+
+* Now gdverse requires sdsfun with a minimum version of `0.4.3` (#19).
+
+* Transfer `isp`-related concepts and functions to the `cisp` package (#18).
+
+* Modify the default font settings in the gdverse S3 plotting methods (#17).
+
 # gdverse 1.2
 
 * Set the default number of discretizations in gdverse to range from 3 to 8 (#15).

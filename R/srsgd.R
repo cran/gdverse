@@ -39,13 +39,13 @@
 #'
 srsgd = \(formula,data,wt = NULL,type = "factor",alpha = 0.95){
   if (length(type) == 1){
-    res = srs_geodetector(formula,data,wt,type,alpha)
+    res = gdverse::srs_geodetector(formula,data,wt,type,alpha)
   } else {
     res = vector("list", length(type))
     for (i in seq_along(type)){
-      res[[i]] = srs_geodetector(formula, data, wt,
-                                 type = type[i],
-                                 alpha = alpha)[[1]]
+      res[[i]] = gdverse::srs_geodetector(formula, data, wt,
+                                          type = type[i],
+                                          alpha = alpha)[[1]]
     }
     names(res) = type
     class(res) = "srsgd_result"
@@ -65,7 +65,7 @@ srsgd = \(formula,data,wt = NULL,type = "factor",alpha = 0.95){
 #' @export
 print.srsgd_result = \(x, ...) {
   nx = names(x)
-  cat("Spatial Rough Set-based Geographical Detector \n")
+  cat("***     Spatial Rough Set-based Geographical Detector      \n")
   for (i in seq_along(x)){
     res = x[i]
     class(res) = paste0(nx[i],"_detector")

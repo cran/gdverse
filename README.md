@@ -20,7 +20,7 @@ Current models and functions provided by **gdverse** are:
 
 | *Model* | *Function* | *Support* |
 |----|----|----|
-| [GD](https://doi.org/10.1080/13658810802443457) | `gd()` | ✔️ |
+| [GeoDetector](https://doi.org/10.1080/13658810802443457) | `geodetector()` | ✔️ |
 | [OPGD](https://doi.org/10.1080/15481603.2020.1760434) | `opgd()` | ✔️ |
 | [GOZH](https://doi.org/10.1016/j.isprsjprs.2022.01.009) | `gozh()` | ✔️ |
 | [LESH](https://doi.org/10.1080/17538947.2023.2271883) | `lesh()` | ✔️ |
@@ -32,18 +32,9 @@ Current models and functions provided by **gdverse** are:
 
 <div class="figure" style="text-align: center">
 
-<img src="./man/figures/gdm.png" alt="Development of Geographical Detector Models" width="100%" />
+<img src="./man/figures/gdverse_funs.png" alt="Functions organization in gdverse package" width="95%" />
 <p class="caption">
-Development of Geographical Detector Models
-</p>
-
-</div>
-
-<div class="figure" style="text-align: center">
-
-<img src="./man/figures/gdverse_funs.png" alt="Function organization in gdverse package" width="95%" />
-<p class="caption">
-Function organization in gdverse package
+Functions organization in gdverse package
 </p>
 
 </div>
@@ -76,9 +67,14 @@ devtools::install_github("stscl/gdverse",
                          dep = TRUE)
 ```
 
-Please ensure that **Rcpp** is properly installed and the appropriate
+✨ Please ensure that **Rcpp** is properly installed and the appropriate
 **C++** compilation environment is configured in advance if you want to
 install **gdverse** from github.
+
+✨ The **gdverse** package supports the use of robust discretization for
+the robust geographical detector and robust interaction detector. For
+details on using them, please refer to
+<https://stscl.github.io/gdverse/articles/rgdrid.html>.
 
 ## Example
 
@@ -111,8 +107,8 @@ discvar
 ndvi_opgd = opgd(NDVIchange ~ ., data = ndvi, 
                  discvar = discvar, cores = 6)
 ndvi_opgd
-##                 OPGD Model                  
-## ***          Factor Detector            
+## ***   Optimal Parameters-based Geographical Detector     
+##                 Factor Detector            
 ## 
 ## |   variable    | Q-statistic | P-value  |
 ## |:-------------:|:-----------:|:--------:|
@@ -129,8 +125,8 @@ ndvi_opgd
 ``` r
 g = gozh(NDVIchange ~ ., data = ndvi)
 g
-##                 GOZH Model                  
-## ***          Factor Detector            
+## ***   Geographically Optimal Zones-based Heterogeneity Model       
+##                 Factor Detector            
 ## 
 ## |   variable    | Q-statistic | P-value  |
 ## |:-------------:|:-----------:|:--------:|
