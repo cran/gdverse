@@ -1,3 +1,20 @@
+# gdverse 1.3-2
+
+* Experimentally support computing confidence intervals for the q statistic in factor_detector (#51).
+
+* Support adjusting the font size of q-value labels in the factor detection result plot (#49).
+
+* Rename `gd_besttunidisc` as `gd_optunidisc` (#39).
+
+* Specify that the `cores` parameter in all functions of the `gdverse` package currently supports 
+only positive integer inputs (#36).
+
+* Update the documentation on Python dependency configuration in the `rgdrid` vignette (#30).
+
+* Discuss the consistency with the results of existing geographical detector R packages (#28).
+
+* Update the calculation method of pseudo p-values for the SPADE model (#26).
+
 # gdverse 1.3-1
 
 * Fix bugs of `gd`,`opgd`,`gozh`,`srsgd` plot s3 methods (#23).
@@ -64,10 +81,6 @@
   
 * Updating the S3 method for plotting various factor detectors to better conform 
   to academic publication requirements.
-  
-* Using new example data in the vignettes for `spade` and `idsa`.
-
-* Adding the `esp` function to the package.
 
 # gdverse 1.0-1
 

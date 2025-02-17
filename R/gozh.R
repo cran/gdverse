@@ -1,7 +1,5 @@
 #' @title geographically optimal zones-based heterogeneity(GOZH) model
 #' @author Wenbo Lv \email{lyu.geosocial@gmail.com}
-#' @description
-#' Function for geographically optimal zones-based heterogeneity(GOZH) model
 #' @references
 #' Luo, P., Song, Y., Huang, X., Ma, H., Liu, J., Yao, Y., & Meng, L. (2022). Identifying determinants of
 #' spatio-temporal disparities in soil moisture of the Northern Hemisphere using a geographically optimal
@@ -117,8 +115,8 @@ plot.gozh_result = \(x, ...) {
 #'
 #' @param formula A formula of GOZH detector.
 #' @param data A data.frame or tibble of observation data.
-#' @param cores (optional) A positive integer(default is 1). If cores > 1, a 'parallel' package
-#' cluster with that many cores is created and used. You can also supply a cluster object.
+#' @param cores (optional) Positive integer (default is 1). When cores are greater than 1, use
+#' multi-core parallel computing.
 #' @param type (optional) The type of geographical detector,which must be one of `factor`(default),
 #' `interaction`, `risk`, `ecological`.
 #' @param alpha (optional) Confidence level of the interval,default is `0.95`.
@@ -145,12 +143,10 @@ gozh_detector = \(formula, data, cores = 1,
   }
 
   doclust = FALSE
-  if (inherits(cores, "cluster")) {
+  if (cores > 1) {
     doclust = TRUE
-  } else if (cores > 1) {
-    doclust = TRUE
-    cores = parallel::makeCluster(cores)
-    on.exit(parallel::stopCluster(cores), add = TRUE)
+    cl = parallel::makeCluster(cores)
+    on.exit(parallel::stopCluster(cl), add = TRUE)
   }
 
   formula = stats::as.formula(formula)
@@ -202,7 +198,7 @@ gozh_detector = \(formula, data, cores = 1,
             variable1 = purrr::map_chr(seq_along(xinteract), \(x) xinteract[[x]][1])
             variable2 = purrr::map_chr(seq_along(xinteract), \(x) xinteract[[x]][2])
             if (doclust) {
-              qv12 = as.numeric(parallel::parLapply(cores,xinteract,calcul_pd))
+              qv12 = as.numeric(parallel::parLapply(cl,xinteract,calcul_pd))
             } else {
               qv12 = purrr::map_dbl(xinteract,calcul_pd)
             }

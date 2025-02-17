@@ -11,29 +11,20 @@
 #' @export
 NULL
 
-#' @title randomly shuffling vector
+#' @title generate permutations
 #'
 #' @param x A vector.
-#' @param shuffle_rate The shuffling rate.
 #' @param seed (optional) Random seed number. Default is `123456789`.
 #'
-#' @return A shuffled vector.
+#' @return A permutations vector.
 #' @export
 #'
 #' @examples
-#' shuffle_vector(1:100,0.15)
+#' gen_permutations(1:100,42)
 #'
-shuffle_vector = \(x,shuffle_rate,seed = 123456789){
+gen_permutations = \(x,seed = 123456789){
   set.seed(seed)
-  n = length(x)
-  shuffle_size = floor(n * shuffle_rate)
-  if (shuffle_size == 0) {
-    return(x)
-  } else {
-    shuffle_indices = sample(1:n, size = shuffle_size)
-    new_x = c(x[shuffle_indices], x[-shuffle_indices])
-    return(new_x)
-  }
+  return(sample(x))
 }
 
 #' @title assign values by weight
@@ -77,4 +68,15 @@ all2int = \(x){
     x = as.integer(as.factor(x))
   }
   return(x)
+}
+
+.calc_ncfncp = \(Fv, df1, df2, alpha = 0.05, interval = c(0, 10000)) {
+  # Define function to solve for the non-centrality parameter (λ)
+  func = function(lambda) stats::pf(Fv, df1, df2, ncp = lambda) - alpha
+  # Try to find the root, return 0 if uniroot fails
+  root = tryCatch(
+    stats::uniroot(func, interval)$root,
+    error = function(e) 0
+  )
+  return(root)
 }

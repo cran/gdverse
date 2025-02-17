@@ -6,18 +6,23 @@
 #'
 #' @param y Variable Y, continuous numeric vector.
 #' @param x Covariate X, \code{factor}, \code{character} or \code{discrete numeric}.
+#' @param confintv (optional) Whether to compute the confidence interval for the q statistic,
+#' default is `FALSE`.
+#' @param alpha (optional) Confidence level of the interval, default is `0.95`.
 #'
 #' @return A list.
 #' \describe{
 #' \item{\code{Q-statistic}}{the q statistic for factor detector}
 #' \item{\code{P-value}}{the p value for factor detector}
+#' \item{\code{CIL}}{the confidence interval lower bound}
+#' \item{\code{CIU}}{the confidence interval upper bound}
 #' }
 #' @export
 #'
 #' @examples
 #' factor_detector(y = 1:7,x = c('x',rep('y',3),rep('z',3)))
 #'
-factor_detector = \(y,x){
+factor_detector = \(y,x,confintv = FALSE,alpha = 0.95){
   x = gdverse::all2int(x)
   gdf = tibble::tibble(x = x, y = y) %>%
     dplyr::group_by(x) %>%
@@ -38,7 +43,18 @@ factor_detector = \(y,x){
   lambda = (v1 - v2) / (stats::var(y) * (N - 1) / N)
   pv = suppressWarnings(stats::pf(Fv, df1 = (L - 1), df2 = (N - L),
                                   ncp = lambda, lower.tail = FALSE))
-  fd = list("Q-statistic" = qv, "P-value" = pv)
+  if (confintv) {
+    alpha1 = dplyr::if_else(alpha>=0.5,alpha,1-alpha)
+    alpha2 = 1 - alpha1
+    ncp1 = .calc_ncfncp(Fv,L-1,N-L,alpha1)
+    ncp2 = .calc_ncfncp(Fv,L-1,N-L,alpha2)
+    fd = list("Q-statistic" = qv, "P-value" = pv,
+              "CIL" = (ncp1 / (ncp1 + N)),
+              "CIU" = (ncp2 / (ncp2 + N)))
+  } else {
+    fd = list("Q-statistic" = qv, "P-value" = pv)
+  }
+
   return(fd)
 }
 
@@ -98,10 +114,9 @@ interaction_detector = \(y,x1,x2){
 #'
 #' @param y Variable Y, continuous numeric vector.
 #' @param x Covariate X, \code{factor}, \code{character} or \code{discrete numeric}.
-#' @param alpha (optional) Confidence level of the interval,default is `0.95`.
+#' @param alpha (optional) Confidence level of the interval, default is `0.95`.
 #'
-#' @return A tibble. contains different combinations of covariate \code{X} level and student t-test statistics,
-#' degrees of freedom, p-values, and whether has risk (Yes or No).
+#' @return A tibble.
 #' @export
 #'
 #' @examples
@@ -188,7 +203,7 @@ ecological_detector = \(y,x1,x2,alpha = 0.95){
 #' `interaction`, `risk`, `ecological`.
 #' @param alpha (optional) Specifies the size of the alpha (confidence level). Default is `0.95`.
 #'
-#' @return A list of tibble with the corresponding result under different detector types.
+#' @return A list.
 #' \describe{
 #' \item{\code{factor}}{the result of factor detector}
 #' \item{\code{interaction}}{the result of interaction detector}
@@ -398,12 +413,14 @@ print.ecological_detector = \(x, ...) {
 #' @param alpha (optional) Confidence level. Default is `0.95`.
 #' @param keep (optional) Whether to keep Q-value results for insignificant variables,
 #' default is `TRUE`.
+#' @param qlabelsize (optional) Set the font size of the q-value text labels in the plot.
 #' @param ... (optional) Other arguments passed to `ggplot2::theme()`.
 #'
 #' @return A ggplot2 layer.
 #' @export
 #'
-plot.factor_detector = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {
+plot.factor_detector = \(x, slicenum = 2, alpha = 0.95,
+                         keep = TRUE, qlabelsize = 3.88, ...) {
   g = x$factor %>%
     dplyr::select(variable, qv = `Q-statistic`,pv = `P-value`) %>%
     dplyr::filter(!is.na(qv)) %>%
@@ -429,10 +446,10 @@ plot.factor_detector = \(x, slicenum = 2, alpha = 0.95, keep = TRUE, ...) {
                                values = c("#DE3533","#808080")) +
     ggplot2::geom_text(data = dplyr::slice(g, seq(1,slicenum)),
                        ggplot2::aes(label = qv_text), hjust = 1.25,
-                       family = "serif", fontface = "bold") +
+                       family = "serif", fontface = "bold", size = qlabelsize) +
     ggplot2::geom_text(data = dplyr::slice(g, -seq(1,slicenum)),
                        ggplot2::aes(label = qv_text), hjust = -0.1,
-                       family = "serif", fontface = "bold") +
+                       family = "serif", fontface = "bold", size = qlabelsize) +
     ggplot2::labs(x = "Q value", y = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),

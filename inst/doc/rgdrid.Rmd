@@ -11,7 +11,7 @@ vignette: >
 
 ### Set up python dependence
 
-1. Install **miniconda**
+1. Install **miniconda3**
 2. Open the conda terminal and perform steps `3` to `6`
 3. Create a new conda env `gdverse`
 
@@ -33,14 +33,15 @@ vignette: >
 
    - Temporarily setting up `gdverse` python dependence environment using `Sys.setenv()` in the R console or R code like `Sys.setenv(GDVERSE_PYTHON = "path/to/python/environment")`.
 
-   - Or using `usethis::edit_r_environ()` to set long-available `gdverse` python dependencies environment path.
+   - Or using `usethis::edit_r_profile()` and `Sys.setenv(GDVERSE_PYTHON = "path/to/python/environment")` to set long-available `gdverse` python dependencies environment path.
 
 ### Load data and package
 
 
 ``` r
-library(tidyverse)
 library(gdverse)
+## gdverse 1.3.2
+## See itmsa package for entropy-based spatial association measures.
 
 data("ndvi")
 ```
@@ -48,8 +49,8 @@ data("ndvi")
 
 ``` r
 names(ndvi)
-## [1] "NDVIchange"    "Climatezone"   "Mining"        "Tempchange"    "Precipitation" "GDP"          
-## [7] "Popdensity"
+## [1] "NDVIchange"    "Climatezone"   "Mining"        "Tempchange"    "Precipitation"
+## [6] "GDP"           "Popdensity"
 ```
 
 ### Run RGD
