@@ -341,42 +341,46 @@ GDM R Packages</h1>
 
 
 
-<p>This vignette discusses the consistency of results between the basic
-geographic detector in the <code>gdverse</code> package and existing R
-packages of GDModels (i.e., <code>geodetector</code> and <code>GD</code>
-packages). Use the <code>CollectData</code> data from
-<code>geodetector</code> package as the demo;</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>collectdata <span class="ot">=</span> geodetector<span class="sc">::</span>CollectData</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>res1 <span class="ot">=</span> geodetector<span class="sc">::</span><span class="fu">factor_detector</span>(<span class="st">&quot;incidence&quot;</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                                    <span class="fu">c</span>(<span class="st">&quot;soiltype&quot;</span>,<span class="st">&quot;watershed&quot;</span>,<span class="st">&quot;elevation&quot;</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                                    collectdata)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>res1</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="do">## [[1]]</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">##          q-statistic   p-value</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">## soiltype   0.3857168 0.3632363</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## [[2]]</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">##           q-statistic      p-value</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## watershed   0.6377737 0.0001169914</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="do">## [[3]]</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="do">##           q-statistic    p-value</span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="do">## elevation   0.6067087 0.04080407</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>res2 <span class="ot">=</span> GD<span class="sc">::</span><span class="fu">gd</span>(incidence <span class="sc">~</span> ., <span class="at">data =</span> collectdata)</span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>res2</span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="do">##    variable        qv         sig</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="do">## 1 watershed 0.6377737 0.000128803</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="do">## 2  soiltype 0.3857168 0.372145486</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="do">## 3 elevation 0.6067087 0.043382244</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>res3 <span class="ot">=</span> gdverse<span class="sc">::</span><span class="fu">geodetector</span>(incidence <span class="sc">~</span> ., <span class="at">data =</span> collectdata)</span>
+<p>This vignette discusses the consistency of results between the factor
+detector in the <code>gdverse</code> package and existing R packages of
+GDModels (i.e., <code>geodetector</code> and <code>GD</code> packages).
+Use the <code>NTDs</code> data from <code>gdverse</code> package as the
+demo;</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>NTDs <span class="ot">=</span> gdverse<span class="sc">::</span>NTDs[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>res1 <span class="ot">=</span> gdverse<span class="sc">::</span><span class="fu">gd</span>(incidence <span class="sc">~</span> ., <span class="at">data =</span> NTDs)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>res1</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="do">##                 Factor Detector            </span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">## | variable  | Q-statistic |   P-value   |</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">## |:---------:|:-----------:|:-----------:|</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## | watershed |  0.6377737  | 0.000128803 |</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## | elevation |  0.6067087  | 0.043382244 |</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## | soiltype  |  0.3857168  | 0.372145486 |</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>res2 <span class="ot">=</span> GD<span class="sc">::</span><span class="fu">gd</span>(incidence <span class="sc">~</span> ., <span class="at">data =</span> NTDs)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>res2</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="do">##    variable        qv         sig</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="do">## 1 watershed 0.6377737 0.000128803</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="do">## 2 elevation 0.6067087 0.043382244</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="do">## 3  soiltype 0.3857168 0.372145486</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co"># The geodetector package do not support the `tibble`</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>res3 <span class="ot">=</span> geodetector<span class="sc">::</span><span class="fu">factor_detector</span>(<span class="st">&quot;incidence&quot;</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>                                    <span class="fu">c</span>(<span class="st">&quot;soiltype&quot;</span>,<span class="st">&quot;watershed&quot;</span>,<span class="st">&quot;elevation&quot;</span>),</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>                                    <span class="fu">as.data.frame</span>(NTDs))</span>
 <span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>res3</span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="do">##                 Factor Detector            </span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="do">## | variable  | Q-statistic |   P-value   |</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="do">## |:---------:|:-----------:|:-----------:|</span></span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="do">## | watershed |  0.6377737  | 0.000128803 |</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="do">## | elevation |  0.6067087  | 0.043382244 |</span></span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="do">## | soiltype  |  0.3857168  | 0.372145486 |</span></span></code></pre></div>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="do">## [[1]]</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="do">##          q-statistic   p-value</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="do">## soiltype   0.3857168 0.3632363</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="do">## [[2]]</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="do">##           q-statistic      p-value</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="do">## watershed   0.6377737 0.0001169914</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="do">## [[3]]</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="do">##           q-statistic    p-value</span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="do">## elevation   0.6067087 0.04080407</span></span></code></pre></div>
 <p>The q-statistic calculations for all variables in the three packages
 are consistent, but there are slight differences in the results of the
 q-values. Among them, <code>gdverse</code> is consistent with the
@@ -387,7 +391,7 @@ the q-statistic; when there is only one sample in a certain
 stratification, it cannot calculate the variance and therefore does not
 contribute to the q-statistic calculation. The <code>gdverse</code> and
 <code>GD</code> packages use the same strategy, which is to directly
-remove these single-sample layers, but the <code>geodetector</code>
+remove these single-sample stratas, but the <code>geodetector</code>
 package calculates the total sample size and stratification number
 directly before data processing, so it causes a slight difference in the
 estimation of the p-value for the q-statistic. In actual problems, this

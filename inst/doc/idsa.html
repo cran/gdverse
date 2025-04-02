@@ -349,54 +349,34 @@ demonstrate the use of the IDSA model.</p>
 <div id="load-data-and-package" class="section level3">
 <h3>Load data and package</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="do">## Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="do">## ── Attaching core tidyverse packages ─────────────────────────────────────── tidyverse 2.0.0 ──</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="do">## ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="do">## ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## ✔ purrr     1.0.2</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## ── Conflicts ───────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## ✖ dplyr::filter() masks stats::filter()</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## ✖ dplyr::lag()    masks stats::lag()</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">library</span>(gdverse)</span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="do">## gdverse 1.3.2</span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="do">## See itmsa package for entropy-based spatial association measures.</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>depression <span class="ot">=</span> <span class="fu">system.file</span>(<span class="st">&#39;extdata/Depression.csv&#39;</span>,<span class="at">package =</span> <span class="st">&#39;gdverse&#39;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>  <span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&#39;X&#39;</span>,<span class="st">&#39;Y&#39;</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="do">## Rows: 1072 Columns: 13</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="do">## ── Column specification ───────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="do">## Delimiter: &quot;,&quot;</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="do">## dbl (13): X, Y, Depression_prevelence, PopulationDensity, Population65, NoHealthInsurance, ...</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="do">## ℹ Use `spec()` to retrieve the full column specification for this data.</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="do">## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>depression</span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="do">## Simple feature collection with 1072 features and 11 fields</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="do">## Geometry type: POINT</span></span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="do">## Dimension:     XY</span></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="do">## Bounding box:  xmin: -83.1795 ymin: 32.11464 xmax: -78.6023 ymax: 35.17354</span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="do">## Geodetic CRS:  WGS 84</span></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="do">## # A tibble: 1,072 × 12</span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="do">##    Depression_prevelence PopulationDensity Population65 NoHealthInsurance Neighbor_Disadvantage</span></span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="do">##  *                 &lt;dbl&gt;             &lt;dbl&gt;        &lt;dbl&gt;             &lt;dbl&gt;                 &lt;dbl&gt;</span></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="do">##  1                  23.1              61.5         22.5              7.98               -0.0525</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="do">##  2                  22.8              58.3         16.8             11.0                -0.254 </span></span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="do">##  3                  23.2              35.9         24.5              9.31               -0.0540</span></span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="do">##  4                  21.8              76.1         21.8             13.2                 0.0731</span></span>
-<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="do">##  5                  20.7              47.3         22.0             11                   0.763 </span></span>
-<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="do">##  6                  21.3              32.5         19.2             13.0                 0.422 </span></span>
-<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="do">##  7                  22                36.9         19.2             10.8                 0.113 </span></span>
-<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="do">##  8                  21.2              61.5         15.9              8.57               -0.154 </span></span>
-<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a><span class="do">##  9                  22.7              67.2         15.7             17.8                -0.320 </span></span>
-<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a><span class="do">## 10                  20.6             254.          11.3             12.7                 0.457 </span></span>
-<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="do">## # ℹ 1,062 more rows</span></span>
-<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a><span class="do">## # ℹ 7 more variables: Beer &lt;dbl&gt;, MentalHealthPati &lt;dbl&gt;, NatureParks &lt;dbl&gt;, Casinos &lt;dbl&gt;,</span></span>
-<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="do">## #   DrinkingPlaces &lt;dbl&gt;, X.HouseRent &lt;dbl&gt;, geometry &lt;POINT [°]&gt;</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(gdverse)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>depression <span class="ot">=</span> <span class="fu">system.file</span>(<span class="st">&#39;extdata/Depression.csv&#39;</span>,<span class="at">package =</span> <span class="st">&#39;gdverse&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&#39;X&#39;</span>,<span class="st">&#39;Y&#39;</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>depression</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## Simple feature collection with 1072 features and 11 fields</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## Geometry type: POINT</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## Dimension:     XY</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## Bounding box:  xmin: -83.1795 ymin: 32.11464 xmax: -78.6023 ymax: 35.17354</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## Geodetic CRS:  WGS 84</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="do">## # A tibble: 1,072 × 12</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="do">##    Depression_prevelence PopulationDensity Population65 NoHealthInsurance Neighbor_Disadvantage</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="do">##  *                 &lt;dbl&gt;             &lt;dbl&gt;        &lt;dbl&gt;             &lt;dbl&gt;                 &lt;dbl&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="do">##  1                  23.1              61.5         22.5              7.98               -0.0525</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="do">##  2                  22.8              58.3         16.8             11.0                -0.254 </span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="do">##  3                  23.2              35.9         24.5              9.31               -0.0540</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="do">##  4                  21.8              76.1         21.8             13.2                 0.0731</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="do">##  5                  20.7              47.3         22.0             11                   0.763 </span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="do">##  6                  21.3              32.5         19.2             13.0                 0.422 </span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="do">##  7                  22                36.9         19.2             10.8                 0.113 </span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="do">##  8                  21.2              61.5         15.9              8.57               -0.154 </span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="do">##  9                  22.7              67.2         15.7             17.8                -0.320 </span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="do">## 10                  20.6             254.          11.3             12.7                 0.457 </span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="do">## # ℹ 1,062 more rows</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="do">## # ℹ 7 more variables: Beer &lt;dbl&gt;, MentalHealthPati &lt;dbl&gt;, NatureParks &lt;dbl&gt;, Casinos &lt;dbl&gt;,</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="do">## #   DrinkingPlaces &lt;dbl&gt;, X.HouseRent &lt;dbl&gt;, geometry &lt;POINT [°]&gt;</span></span></code></pre></div>
 </div>
 <div id="construct-spatial-weight" class="section level3">
 <h3>Construct spatial Weight</h3>
@@ -410,7 +390,7 @@ demonstrate the use of the IDSA model.</p>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                  <span class="at">data =</span> depression,</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                  <span class="at">wt =</span> wt, <span class="at">cores =</span> <span class="dv">12</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">toc</span>()</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="do">## 66.91 sec elapsed</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="do">## 62.8 sec elapsed</span></span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>idsa.model</span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="do">## ***     Interactive Detector For Spatial Associations </span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="do">## </span></span>

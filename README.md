@@ -5,10 +5,19 @@
 
 <!-- badges: start -->
 
-[![cran](https://www.r-pkg.org/badges/version/gdverse)](https://CRAN.R-project.org/package=gdverse)
-[![downloads_all](https://badgen.net/cran/dt/gdverse?color=orange)](https://CRAN.R-project.org/package=gdverse)
-[![downloads_month](https://cranlogs.r-pkg.org/badges/gdverse)](https://CRAN.R-project.org/package=gdverse)
-[![r-universe](https://stscl.r-universe.dev/badges/gdverse?color=cyan)](https://stscl.r-universe.dev/gdverse)
+[![CRAN](https://www.r-pkg.org/badges/version/gdverse)](https://CRAN.R-project.org/package=gdverse)
+[![CRAN
+Release](https://www.r-pkg.org/badges/last-release/gdverse)](https://CRAN.R-project.org/package=gdverse)
+[![CRAN
+Checks](https://badges.cranchecks.info/worst/gdverse.svg)](https://cran.r-project.org/web/checks/check_results_gdverse.html)
+[![Downloads_all](https://badgen.net/cran/dt/gdverse?color=orange)](https://CRAN.R-project.org/package=gdverse)
+[![Downloads_month](https://cranlogs.r-pkg.org/badges/gdverse)](https://CRAN.R-project.org/package=gdverse)
+[![License](https://img.shields.io/badge/license-GPL--3-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html)
+[![R-CMD-check](https://github.com/stscl/gdverse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/stscl/gdverse/actions/workflows/R-CMD-check.yaml)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-20b2aa.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-universe](https://stscl.r-universe.dev/badges/gdverse?color=cyan)](https://stscl.r-universe.dev/gdverse)
+[![DOI](https://img.shields.io/badge/DOI-10.1111%2Ftgis.70032-63847e?logo=doi&style=flat)](https://onlinelibrary.wiley.com/doi/10.1111/tgis.70032)
 
 <!-- badges: end -->
 
@@ -20,7 +29,7 @@ Current models and functions provided by **gdverse** are:
 
 | *Model* | *Function* | *Support* |
 |----|----|----|
-| [GeoDetector](https://doi.org/10.1080/13658810802443457) | `geodetector()` | ✔️ |
+| [GD](https://doi.org/10.1080/13658810802443457) | `gd()` | ✔️ |
 | [OPGD](https://doi.org/10.1080/15481603.2020.1760434) | `opgd()` | ✔️ |
 | [GOZH](https://doi.org/10.1016/j.isprsjprs.2022.01.009) | `gozh()` | ✔️ |
 | [LESH](https://doi.org/10.1080/17538947.2023.2271883) | `lesh()` | ✔️ |
@@ -127,4 +136,27 @@ g
 ## |  Popdensity   | 0.22321863  | 3.00e-10 |
 ## |    Mining     | 0.13982859  | 6.00e-11 |
 ## |      GDP      | 0.09170153  | 3.96e-10 |
+```
+
+## CITATION
+
+Please cite **gdverse** as:
+
+    Lv, W., Lei, Y., Liu, F., Yan, J., Song, Y. and Zhao, W. (2025), gdverse: An R Package for Spatial Stratified Heterogeneity Family. Transactions in GIS, 29: e70032. https://doi.org/10.1111/tgis.70032
+
+A BibTeX entry for LaTeX users is:
+
+``` bib
+@article{lyu2025gdverse, 
+    title={gdverse: An R Package for Spatial Stratified Heterogeneity Family}, 
+    volume={29}, 
+    ISSN={1467-9671},
+    number={2}, 
+    journal={Transactions in GIS}, 
+    publisher={Wiley}, 
+    pages = {29:e70032},
+    author={Lv, Wenbo and Lei, Yangyang and Liu, Fangmei and Yan, Jianwu and Song, Yongze and Zhao, Wufan},
+    year={2025}, 
+    month={mar}
+}
 ```

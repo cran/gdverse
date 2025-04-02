@@ -354,34 +354,20 @@ selection function in <strong>gdverse</strong>.</p>
 <p>First, we construct FVC data under different spatial units using the
 original data.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="do">## terra 1.8.5</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="do">## ── Attaching core tidyverse packages ─────────────────────────────────────── tidyverse 2.0.0 ──</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="do">## ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="do">## ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## ✔ purrr     1.0.2</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## ── Conflicts ───────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## ✖ tidyr::extract() masks terra::extract()</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## ✖ dplyr::filter()  masks stats::filter()</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## ✖ dplyr::lag()     masks stats::lag()</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="do">## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="fu">library</span>(gdverse)</span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="do">## gdverse 1.3.2</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="do">## See itmsa package for entropy-based spatial association measures.</span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>fvcpath <span class="ot">=</span> <span class="st">&quot;https://github.com/SpatLyu/rdevdata/raw/main/FVC.tif&quot;</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>fvc <span class="ot">=</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(<span class="st">&quot;/vsicurl/&quot;</span>,fvcpath))</span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>fvc</span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="do">## class       : SpatRaster </span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="do">## dimensions  : 418, 568, 13  (nrow, ncol, nlyr)</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="do">## resolution  : 1000, 1000  (x, y)</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="do">## extent      : -92742.16, 475257.8, 3591385, 4009385  (xmin, xmax, ymin, ymax)</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="do">## coord. ref. : Asia_North_Albers_Equal_Area_Conic </span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="do">## source      : FVC.tif </span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="do">## names       :       fvc,   premax,   premin,   presum,    tmpmax,     tmpmin, ... </span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="do">## min values  : 0.1363270, 109.8619,  2.00000, 3783.904,  9.289694, -11.971293, ... </span></span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="do">## max values  : 0.9596695, 249.9284, 82.74928, 8549.112, 26.781870,   1.322163, ...</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(gdverse)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>fvcpath <span class="ot">=</span> <span class="st">&quot;https://github.com/SpatLyu/rdevdata/raw/main/FVC.tif&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>fvc <span class="ot">=</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(<span class="st">&quot;/vsicurl/&quot;</span>,fvcpath))</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>fvc</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="do">## class       : SpatRaster </span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="do">## dimensions  : 418, 568, 13  (nrow, ncol, nlyr)</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="do">## resolution  : 1000, 1000  (x, y)</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="do">## extent      : -92742.16, 475257.8, 3591385, 4009385  (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="do">## coord. ref. : Asia_North_Albers_Equal_Area_Conic </span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="do">## source      : FVC.tif </span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="do">## names       :       fvc,   premax,   premin,   presum,    tmpmax,     tmpmin, ... </span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="do">## min values  : 0.1363270, 109.8619,  2.00000, 3783.904,  9.289694, -11.971293, ... </span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="do">## max values  : 0.9596695, 249.9284, 82.74928, 8549.112, 26.781870,   1.322163, ...</span></span></code></pre></div>
 <p>The original data resolution is <code>1000</code>m, and then we
 construct the data under <code>2000-10000</code> m spatial units with
 1000 spatial unit interval.</p>
@@ -538,7 +524,7 @@ construct the data under <code>2000-10000</code> m spatial units with
 <div id="comparison-of-size-effect-of-spatial-units-based-on-opgd-model" class="section level2">
 <h2>Comparison of Size Effect of Spatial Units based on OPGD model</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>discvar <span class="ot">=</span> <span class="fu">names</span>(<span class="fu">select</span>(fvc1000,<span class="sc">-</span><span class="fu">c</span>(fvc,lulc)))</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>g1 <span class="ot">=</span> <span class="fu">sesu_opgd</span>(fvc <span class="sc">~</span> ., <span class="at">data =</span> fvc,<span class="at">su =</span> su,<span class="at">discvar =</span> discvar,<span class="at">cores =</span> <span class="dv">6</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>g1 <span class="ot">=</span> <span class="fu">sesu_opgd</span>(fvc <span class="sc">~</span> ., <span class="at">data =</span> fvc,<span class="at">su =</span> su,<span class="at">discvar =</span> discvar,<span class="at">cores =</span> <span class="dv">12</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>g1</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="do">##    Size Effect Of Spatial Units Using OPGD Model   </span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="do">##  ***    Optimal Spatial Unit: 8000</span></span>
@@ -717,7 +703,7 @@ construct the data under <code>2000-10000</code> m spatial units with
 <div id="comparison-of-size-effect-of-spatial-units-based-on-gozh-model" class="section level2">
 <h2>Comparison of Size Effect of Spatial Units based on GOZH model</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>g2 <span class="ot">=</span> <span class="fu">sesu_gozh</span>(fvc <span class="sc">~</span> ., <span class="at">data =</span> fvc, <span class="at">su =</span> su,</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>               <span class="at">cores =</span> <span class="dv">6</span>, <span class="at">increase_rate =</span> <span class="fl">0.005</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>               <span class="at">cores =</span> <span class="dv">12</span>, <span class="at">increase_rate =</span> <span class="fl">0.005</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>g2</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">##    Size Effect Of Spatial Units Using GOZH Model   </span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">##  ***        Optimal Spatial Unit: 4000</span></span>
@@ -790,7 +776,7 @@ construct the data under <code>2000-10000</code> m spatial units with
 the mean of the individual Q statistic for all explanatory variables) in
 <code>sesu_gozh()</code> by assign <code>strategy</code> to
 <code>1</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>g3 <span class="ot">=</span> <span class="fu">sesu_gozh</span>(fvc <span class="sc">~</span> ., <span class="at">data =</span> fvc, <span class="at">su =</span> su, <span class="at">cores =</span> <span class="dv">6</span>,</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>g3 <span class="ot">=</span> <span class="fu">sesu_gozh</span>(fvc <span class="sc">~</span> ., <span class="at">data =</span> fvc, <span class="at">su =</span> su, <span class="at">cores =</span> <span class="dv">12</span>,</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>               <span class="at">strategy =</span> <span class="dv">1</span>, <span class="at">increase_rate =</span> <span class="fl">0.005</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>g3</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">##    Size Effect Of Spatial Units Using GOZH Model   </span></span>
